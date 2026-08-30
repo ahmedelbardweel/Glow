@@ -1,0 +1,71 @@
+name: Build iOS App
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    name: Build Flutter iOS Application
+    runs-on: macos-14
+    steps:
+      # 1. تنزيل كود المشروع
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. إعداد بيئة جافا
+      - name: ☕ Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # 3. تثبيت بيئة Flutter
+      - name: 💙 Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      # 4. تثبيت مكاتب وحزم Flutter
+      - name: 📦 Install Flutter Dependencies
+        run: flutter pub get
+
+      # 5. مزامنة وتثبيت مكاتب نظام iOS (CocoaPods)
+      - name: 🍎 Sync and Install CocoaPods
+        run: |
+          cd ios
+          pod deintegrate || true
+          pod install --repo-update
+          cd ..
+
+      # 6. بناء ملفات iOS بدون اشتراط توقيع إلكتروني مسبق
+      - name: 🔨 Build iOS App (Release, No Codesign)
+        run: flutter build ios --release --no-codesign
+
+      # 7. تجميع تطبيق iOS وحفظه بصيغة ملف .ipa
+      - name: 📦 Package Unsigned Payload as IPA
+        run: |
+          mkdir -p Payload
+          cp -r build/ios/iphoneos/Runner.app Payload/
+          zip -r App_iOS.ipa Payload
+          mkdir -p dist
+          mv App_iOS.ipa dist/
+
+      # 8. رفع ملف الـ IPA لتتمكن من تحميله من GitHub
+      - name: 🚀 Upload iOS IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-iOS-IPA
+          path: dist/App_iOS.ipa
+          retention-days: 14
+
+      # 9. رفع مجلد Runner.app لمن يريد تشغيله أو توقيعه
+      - name: 🚀 Upload Runner.app Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-iOS-Runner-App
+          path: build/ios/iphoneos/Runner.app
+          retention-days: 14
