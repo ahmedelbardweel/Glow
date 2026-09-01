@@ -12,18 +12,19 @@ import '../../data/models/child_models.dart';
 import '../bloc/child_bloc.dart';
 import 'world_map_screen.dart';
 
-/// 4. شاشة اختيار الشخصية الرفيقة ثلاثية الأبعاد (3D Character Selection)
-/// تتضمن مسرح عرض 3D حقيقي وتفاعلي 360 درجة مع مجسمات الـ GLB المحسنة
+/// Character selection screen.
+/// Interactive 3D character component.
 class CharacterSelectionScreen extends StatefulWidget {
   const CharacterSelectionScreen({super.key});
 
   @override
-  State<CharacterSelectionScreen> createState() => _CharacterSelectionScreenState();
+  State<CharacterSelectionScreen> createState() =>
+      _CharacterSelectionScreenState();
 }
 
 class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
   String _selectedCharacter = 'PORT';
-  bool _useReal3DMesh = true;
+  final bool _useReal3DMesh = true;
 
   void _onConfirm() {
     context.read<ChildBloc>().add(SelectCharacterEvent(_selectedCharacter));
@@ -39,19 +40,14 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
     final characters = CharacterModel.allCharacters;
 
     return AppScaffold(
-      title: 'اختر رفيق رحلتك 3D',
-      subtitle: 'المس الشاشة لتدوير المجسم 360° واستكشاف الشخصية',
+      title: 'اختر رفيق رحلتك',
       body: Column(
         children: [
-          // 1. مسرح العرض ثلاثي الأبعاد التفاعلي (3D Hero Stage)
           Container(
-            height: 200,
             width: double.infinity,
-            margin: const EdgeInsets.only(bottom: 12),
-            alignment: Alignment.center,
             decoration: BoxDecoration(
               color: isDark ? AppColors.darkSurface : AppColors.pureWhite,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(5),
               border: Border.all(
                 color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
                 width: 1,
@@ -69,11 +65,11 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
               children: [
                 if (_useReal3DMesh)
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(5),
                     child: Port3DModelViewer(
                       key: ValueKey('glb_$_selectedCharacter'),
                       characterName: _selectedCharacter,
-                      height: 200,
+                      height: 300,
                       autoRotate: true,
                       cameraControls: true,
                     ),
@@ -82,55 +78,14 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
                   Port3DCharacter(
                     key: ValueKey('avatar_$_selectedCharacter'),
                     characterName: _selectedCharacter,
-                    size: 145,
+                    size: 150,
                     isAnimated: true,
                     enableInteractiveTilt: true,
                   ),
-
-                // زر التبديل بين مجسم الـ GLB والشخصية الحية
-                Positioned(
-                  top: 10,
-                  left: 10,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () => setState(() => _useReal3DMesh = !_useReal3DMesh),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: isDark ? AppColors.darkSurfaceVariant : const Color(0xFFF3EFEB),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            _useReal3DMesh ? Icons.view_in_ar : Icons.animation,
-                            size: 14,
-                            color: isDark ? AppColors.darkTextPrimary : AppColors.textCharcoal,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            _useReal3DMesh ? 'مجسم 3D' : 'رسوم 3D',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? AppColors.darkTextPrimary : AppColors.textCharcoal,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
 
-          // 2. قائمة بطاقات الشخصيات الخمس
           Expanded(
             child: ListView.separated(
               physics: const BouncingScrollPhysics(),
@@ -146,15 +101,16 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
                       ? char.themeColor
                       : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
                   backgroundColor: isSelected
-                      ? (isDark ? AppColors.darkSurfaceVariant : char.themeColor.withValues(alpha: 0.08))
+                      ? (isDark
+                          ? AppColors.darkSurfaceVariant
+                          : char.themeColor.withValues(alpha: 0.08))
                       : (isDark ? AppColors.darkSurface : AppColors.pureWhite),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   onTap: () => setState(() => _selectedCharacter = char.name),
                   child: Row(
                     children: [
-
-
-                      // تفاصيل الشخصية والعنوان والوصف
+                      // Interactive 3D character component.
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,9 +127,11 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
                                 ),
                                 const SizedBox(width: 8),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: char.themeColor.withValues(alpha: 0.14),
+                                    color:
+                                        char.themeColor.withValues(alpha: 0.14),
                                     borderRadius: AppRadius.badge,
                                   ),
                                   child: Text(
@@ -193,7 +151,9 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                               style: AppTypography.bodySmall.copyWith(
-                                color: isDark ? AppColors.darkTextSecondary : AppColors.textMuted,
+                                color: isDark
+                                    ? AppColors.darkTextSecondary
+                                    : AppColors.textMuted,
                                 fontSize: 11,
                                 height: 1.3,
                               ),
@@ -204,22 +164,25 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
 
                       const SizedBox(width: 8),
 
-                      // مؤشر التحديد
                       Container(
-                        width: 26,
-                        height: 26,
+                        width: 20,
+                        height: 20,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isSelected ? char.themeColor : Colors.transparent,
+                          color:
+                              isSelected ? char.themeColor : Colors.transparent,
                           border: Border.all(
                             color: isSelected
                                 ? char.themeColor
-                                : (isDark ? AppColors.darkBorder : const Color(0xFFC7BEBE)),
+                                : (isDark
+                                    ? AppColors.darkBorder
+                                    : const Color(0xFFC7BEBE)),
                             width: 1.5,
                           ),
                         ),
                         child: isSelected
-                            ? const Icon(Icons.check, size: 16, color: Colors.white)
+                            ? const Icon(Icons.check,
+                                size: 16, color: Colors.white)
                             : null,
                       ),
                     ],
@@ -229,9 +192,7 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
             ),
           ),
 
-          const SizedBox(height: 12),
-
-          // زر تأكيد الرفيق
+          // Action button.
           AppButton(
             text: 'انطلق مع $_selectedCharacter',
             variant: AppButtonVariant.primary,

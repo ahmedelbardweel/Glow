@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_radius.dart';
 
-/// شارة هندسية مخصصة للتحكم البصري دون استخدام أيقونات أو إيموجي
 class VisualIndicator extends StatelessWidget {
   final String label;
   final Color color;

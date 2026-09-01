@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_radius.dart';
 
-/// صورة وشخصية رمزية ثلاثية الأبعاد (3D Character Avatar)
-/// تعرض شخصيات PORT الخمس (PORT, MORT, FORT, QORT, LORT) برسومات 3D جذابة ومقصوصة بشكل متقن
+/// Interactive 3D character component.
+/// Interactive 3D character component.
 class PortShapeAvatar extends StatelessWidget {
   final String characterName; // PORT, MORT, FORT, QORT, LORT
   final double size;
@@ -86,7 +86,7 @@ class PortShapeAvatar extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // 1. صورة وجه الشخصية 3D مقصوصة بدقة واحترافية
+          // Interactive 3D character component.
           if (use3D)
             ClipRRect(
               borderRadius: BorderRadius.circular(size * 0.22),
@@ -124,7 +124,7 @@ class PortShapeAvatar extends StatelessWidget {
               ),
             ),
 
-          // 2. شارة اسم الشخصية
+          // Interactive 3D character component.
           if (showBadge)
             Positioned(
               bottom: 2,
@@ -159,7 +159,7 @@ class PortShapeAvatar extends StatelessWidget {
   }
 }
 
-/// رسم وجه الشخصية الاحتياطي
+/// Interactive 3D character component.
 class _CharacterFacePainter extends CustomPainter {
   final Color color;
   final String character;

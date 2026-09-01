@@ -79,13 +79,12 @@ class QuizState extends Equatable {
       ];
 }
 
-// === BLoC مع خوارزمية التوزيع الذكي للخيارات لمنع الحفظ النمطي ===
+// Persists state changes.
 class QuizBloc extends Bloc<QuizEvent, QuizState> {
   QuizBloc() : super(const QuizState()) {
     on<InitQuizEvent>((event, emit) {
       final originalOptions = List<QuizOptionModel>.from(event.mission.quiz.options);
       
-      // خوارزمية توزيع الخيارات العشوائي الذكي مع إعادة تعيين المفاتيح
       originalOptions.shuffle();
       final keys = ['A', 'B', 'C', 'D'];
       String newCorrectKey = 'A';

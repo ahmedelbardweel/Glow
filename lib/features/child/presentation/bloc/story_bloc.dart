@@ -76,14 +76,27 @@ class StoryState extends Equatable {
       ];
 }
 
-// === BLoC ===
+// === BLoC Implementation ===
 class StoryBloc extends Bloc<StoryEvent, StoryState> {
   StoryBloc() : super(const StoryState()) {
     on<InitStoryEvent>((event, emit) {
-      final savedScene = HiveService.getStoryScene(event.mission.id);
+      var scenes = event.mission.storyScenes;
+      if (scenes.isEmpty) {
+        scenes = [
+          StorySceneModel(
+            sceneIndex: 0,
+            speakerName: 'PORT',
+            dialogue: 'مرحباً بك يا بطل! أنا PORT واليوم سنخوض مغامرة تفاعلية لاكتشاف عادة ${event.mission.habitName}.',
+            sceneDescription: 'يقف PORT مستعداً للمغامرة.',
+            backgroundTheme: 'forest_day',
+          ),
+        ];
+      }
+      final fixedMission = event.mission.copyWith(storyScenes: scenes);
+      final savedScene = HiveService.getStoryScene(fixedMission.id);
       emit(StoryState(
-        mission: event.mission,
-        currentSceneIndex: savedScene < event.mission.storyScenes.length ? savedScene : 0,
+        mission: fixedMission,
+        currentSceneIndex: savedScene < scenes.length ? savedScene : 0,
         savedSceneIndex: savedScene,
         isPlaying: true,
         isCompleted: false,
@@ -94,7 +107,6 @@ class StoryBloc extends Bloc<StoryEvent, StoryState> {
       if (state.mission == null) return;
       final nextIndex = state.currentSceneIndex + 1;
       if (nextIndex >= state.mission!.storyScenes.length) {
-        // انتهت القصة
         await HiveService.clearStoryScene(state.mission!.id);
         emit(state.copyWith(isCompleted: true));
       } else {

@@ -8,8 +8,8 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../data/models/child_models.dart';
 import 'story_screen.dart';
 
-/// 7. شاشة اختيار المهمة (Mission Selection)
-/// تقديم المهمة كبطاقة تحدي مشوقة للأطفال بدون أي إيموجي
+/// Application feature screen.
+/// Information card.
 class MissionSelectionScreen extends StatelessWidget {
   final MissionModel mission;
 
@@ -35,14 +35,13 @@ class MissionSelectionScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 8),
 
-                  // بطاقة العادة والتحدي البصري
+                  // Information card.
                   AppCard(
                     backgroundColor: isDark ? AppColors.darkSurface : AppColors.pureWhite,
                     borderWidth: 1,
                     padding: const EdgeInsets.all(10),
                     child: Column(
                       children: [
-                        // شارة رقم التحدي
                         Container(
                           width: 54,
                           height: 54,
@@ -100,7 +99,7 @@ class MissionSelectionScreen extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // بطاقة جوائز ومكافآت المهمة
+                  // Information card.
                   AppCard(
                     backgroundColor: isDark ? AppColors.darkSurface : AppColors.pureWhite,
                     borderWidth: 1,
@@ -159,7 +158,7 @@ class MissionSelectionScreen extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  // بطاقة تجهيز القصة والتحدي
+                  // Information card.
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
@@ -186,7 +185,7 @@ class MissionSelectionScreen extends StatelessWidget {
             ),
           ),
 
-          // زر بدء المهمة الكبير
+          // Action button.
           AppButton(
             text: 'انطلق في القصة والتحدي',
             variant: AppButtonVariant.primary,

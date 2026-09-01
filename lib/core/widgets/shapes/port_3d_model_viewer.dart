@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import '../../theme/app_colors.dart';
 
-/// عارض مجسمات 3D التفاعلي الحقيقي (Real 3D GLB Model Viewer)
-/// يعرض مجسم الشخصية 3D الحقيقي مع إمكانية التدوير 360 درجة، التكبير، والإضاءة الحية
+/// Domain data model.
+/// Interactive 3D character component.
 class Port3DModelViewer extends StatelessWidget {
   final String characterName; // PORT, MORT, FORT, QORT, LORT
   final double height;
@@ -22,14 +22,13 @@ class Port3DModelViewer extends StatelessWidget {
     this.customModelUrl,
   });
 
-  /// رابط المجسم ثلاثي الأبعاد GLB لكل شخصية
-  /// يدعم التحميل من assets أو من رابط CDN سحابي مباشر
+  /// Interactive 3D character component.
   String _getModelSource() {
     if (customModelUrl != null && customModelUrl!.isNotEmpty) {
       return customModelUrl!;
     }
 
-    // مجسمات 3D محلية فائقة السرعة مخزنة في assets/models/
+    // Domain data model.
     switch (characterName.toUpperCase()) {
       case 'MORT':
         return 'assets/models/copilot_3d.glb';
@@ -82,7 +81,6 @@ class Port3DModelViewer extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // خلفية متوهجة ناعمة تبرز المجسم ثلاثي الأبعاد
               Container(
                 height: glowSize,
                 width: glowSize,
@@ -98,7 +96,7 @@ class Port3DModelViewer extends StatelessWidget {
                 ),
               ),
 
-              // عارض المجسم 3D الحقيقي التفاعلي
+              // Interactive 3D character component.
               ModelViewer(
                 src: modelSrc,
                 alt: 'مجسم 3D لشخصية $characterName',
@@ -113,7 +111,6 @@ class Port3DModelViewer extends StatelessWidget {
                 loading: Loading.eager,
               ),
 
-              // شارة إرشادية صغيرة للأطفال بأن المجسم تفاعلي 360°
               if (cameraControls)
                 Positioned(
                   bottom: 4,

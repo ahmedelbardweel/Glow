@@ -77,11 +77,10 @@ class ChildState extends Equatable {
 class ChildBloc extends Bloc<ChildEvent, ChildState> {
   ChildBloc() : super(ChildState(profile: ChildRepository.getChildProfile())) {
     on<LoadChildProfileEvent>((event, emit) async {
-      // 1. قراءة فورية من Hive
       final localProfile = ChildRepository.getChildProfile();
       emit(state.copyWith(profile: localProfile));
 
-      // 2. مزامنة سحابية وتحديث من Supabase في الخلفية
+      // Synchronizes state with cloud backend.
       await OfflineFirstSyncManager.syncDownFromCloud();
       final updatedProfile = ChildRepository.getChildProfile();
       emit(state.copyWith(profile: updatedProfile));
@@ -126,7 +125,7 @@ class ChildBloc extends Bloc<ChildEvent, ChildState> {
         points: state.profile.points + event.earnedPoints,
       );
 
-      // تسجيل وحفظ التقدم محلياً في Hive ومزامنته مع Supabase
+      // Persists state changes.
       await OfflineFirstSyncManager.recordMissionCompletion(
         updatedProfile: updated,
         missionId: event.missionId,

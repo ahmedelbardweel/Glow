@@ -3,8 +3,8 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_button.dart';
 import 'user_selection_screen.dart';
 
-/// 1. شاشة البداية والترحيب (Welcome Screen)
-/// تعرض الشعار الرسمي للتطبيق وتحته زر برتقالي واضح "ابدأ" للدخول المباشر
+/// Splash and welcome screen.
+/// Action button.
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 

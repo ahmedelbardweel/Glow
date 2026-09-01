@@ -9,8 +9,6 @@ import '../../data/models/org_models.dart';
 import '../bloc/org_bloc.dart';
 import 'org_dashboard_screen.dart';
 
-/// 1. تسجيل المنظمة وإعدادات المدير (Organization Setup)
-/// إدخال بيانات المؤسسة التعليمية (مدرسة، روضة، مركز)، أعداد الطلاب، المعلمين، الفصول، وبيانات المدير
 class OrgSetupScreen extends StatefulWidget {
   const OrgSetupScreen({super.key});
 
@@ -74,7 +72,6 @@ class _OrgSetupScreenState extends State<OrgSetupScreen> {
           children: [
             const SizedBox(height: 8),
 
-            // لافتة تعريفية
             AppCard(
               backgroundColor: isDark ? AppColors.darkSurface : AppColors.lavenderPurple.withValues(alpha: 0.1),
               borderColor: AppColors.lavenderPurple,

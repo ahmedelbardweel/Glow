@@ -8,13 +8,13 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_dialog.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/shapes/port_3d_model_viewer.dart';
+import '../../../../core/services/tts_service.dart';
 import '../../data/models/child_models.dart';
 import '../bloc/story_bloc.dart';
 import 'story_complete_screen.dart';
 
-/// 8. شاشة القصة (Story Screen) - الشاشة الأهم
-/// سرد القصة التفاعلية عبر الشخصية المتحدثة مع نصوص، حركة بصرية، وأزرار تحكم كاملة:
-/// (تشغيل / إيقاف / إعادة القصة / تخطي الحوار / استكمال لاحقاً وحفظ المشهد في Hive).
+/// Interactive story narration screen.
+/// Interactive 3D character component.
 class StoryScreen extends StatefulWidget {
   final MissionModel mission;
 
@@ -28,29 +28,73 @@ class _StoryScreenState extends State<StoryScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _progressController;
   int _lastSceneIndex = -1;
+  String _lastMissionId = '';
 
   @override
   void initState() {
     super.initState();
+    _lastSceneIndex = -1;
+    _lastMissionId = '';
     _progressController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 7),
+      duration: const Duration(seconds: 10),
     );
-    _progressController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        context.read<StoryBloc>().add(NextSceneEvent());
-      }
-    });
     context.read<StoryBloc>().add(InitStoryEvent(widget.mission));
+  }
+
+  void _playCurrentSceneAudio(StoryState state) {
+    String dialogue = state.currentScene?.dialogue ?? '';
+    String speaker = state.currentScene?.speakerName ?? 'PORT';
+
+    if (dialogue.isEmpty && widget.mission.storyScenes.isNotEmpty) {
+      dialogue = widget.mission.storyScenes.first.dialogue;
+      speaker = widget.mission.storyScenes.first.speakerName;
+    }
+    if (dialogue.isEmpty) return;
+
+    final estimatedDurationMs = (dialogue.length * 125).clamp(7000, 25000);
+    _progressController.duration = Duration(milliseconds: estimatedDurationMs);
+    _progressController.reset();
+    if (state.isPlaying) {
+      _progressController.forward(from: 0.0);
+    }
+
+    TtsService().speakScene(
+      text: dialogue,
+      speakerName: speaker,
+      onDuration: (duration) {
+        if (mounted && duration.inMilliseconds > 1000) {
+          final bufferedDuration = duration + const Duration(milliseconds: 1200);
+          final currentVal = _progressController.value;
+          _progressController.duration = bufferedDuration;
+          if (state.isPlaying) {
+            _progressController.forward(from: currentVal);
+          }
+        }
+      },
+      onComplete: () {
+        if (mounted && context.read<StoryBloc>().state.isPlaying) {
+          _progressController.animateTo(1.0, duration: const Duration(milliseconds: 400)).then((_) {
+            Future.delayed(const Duration(milliseconds: 1200), () {
+              if (mounted && context.read<StoryBloc>().state.isPlaying) {
+                context.read<StoryBloc>().add(NextSceneEvent());
+              }
+            });
+          });
+        }
+      },
+    );
   }
 
   @override
   void dispose() {
+    TtsService().stop();
     _progressController.dispose();
     super.dispose();
   }
 
   void _onSaveAndExit() async {
+    TtsService().stop();
     _progressController.stop();
     final shouldExit = await AppDialog.show(
       context,
@@ -75,24 +119,27 @@ class _StoryScreenState extends State<StoryScreen>
     return BlocConsumer<StoryBloc, StoryState>(
       listener: (context, state) {
         if (state.isCompleted) {
+          TtsService().stop();
           _progressController.stop();
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (_) => StoryCompleteScreen(mission: widget.mission),
             ),
           );
-        } else {
-          if (_lastSceneIndex != state.currentSceneIndex) {
+        } else if (state.mission != null) {
+          if (_lastSceneIndex != state.currentSceneIndex || _lastMissionId != state.mission!.id) {
             _lastSceneIndex = state.currentSceneIndex;
-            _progressController.reset();
-            if (state.isPlaying) {
-              _progressController.forward();
-            }
-          } else {
-            if (state.isPlaying && !_progressController.isAnimating && _progressController.value < 1.0) {
-              _progressController.forward();
-            } else if (!state.isPlaying && _progressController.isAnimating) {
+            _lastMissionId = state.mission!.id;
+            _playCurrentSceneAudio(state);
+          } else if (!state.isPlaying) {
+            if (_progressController.isAnimating) {
               _progressController.stop();
+            }
+            TtsService().pause();
+          } else if (state.isPlaying && !_progressController.isAnimating && _progressController.value < 1.0) {
+            _progressController.forward();
+            if (TtsService().isPaused) {
+              TtsService().resume();
             }
           }
         }
@@ -107,7 +154,7 @@ class _StoryScreenState extends State<StoryScreen>
           subtitle: 'مشهد ${currentIndex + 1} من $totalScenes',
           onBack: _onSaveAndExit,
           actions: [
-            // زر استكمال لاحقاً
+            // Action button.
             InkWell(
               onTap: _onSaveAndExit,
               borderRadius: AppRadius.all,
@@ -131,7 +178,6 @@ class _StoryScreenState extends State<StoryScreen>
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // شريط تقدم مشاهد القصة التفاعلي والمتحرك مع الثواني
               if (totalScenes > 0)
                 Row(
                   children: List.generate(totalScenes, (index) {
@@ -175,7 +221,6 @@ class _StoryScreenState extends State<StoryScreen>
 
               const SizedBox(height: 12),
 
-              // نافذة مشهد القصة والبيئة التفاعلية (Story Box - Soft Sage Green)
               Expanded(
                 flex: 4,
                 child: AppCard(
@@ -186,7 +231,7 @@ class _StoryScreenState extends State<StoryScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // مجسم الشخصية 3D التفاعلي الحقيقي
+                      // Interactive 3D character component.
                       Expanded(
                         child: Port3DModelViewer(
                           key: ValueKey('story_glb_${scene?.speakerName ?? 'PORT'}'),
@@ -197,7 +242,6 @@ class _StoryScreenState extends State<StoryScreen>
                         ),
                       ),
                       const SizedBox(height: 8),
-                      // وصف المشهد
                       if (scene?.sceneDescription != null)
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -227,7 +271,6 @@ class _StoryScreenState extends State<StoryScreen>
 
               const SizedBox(height: 12),
 
-              // مربع الحوار التفاعلي
               Expanded(
                 flex: 3,
                 child: AppCard(
@@ -279,7 +322,6 @@ class _StoryScreenState extends State<StoryScreen>
                         ),
                       ),
                       const SizedBox(height: 8),
-                      // أدوات التحكم كأيقونات متناسقة في أسفل منتصف كارد النص
                       Center(
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
@@ -294,13 +336,15 @@ class _StoryScreenState extends State<StoryScreen>
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              // زر إعادة المشهد (أيقونة)
+                              // Action button - Replay Scene / Story
                               InkWell(
                                 borderRadius: BorderRadius.circular(16),
                                 onTap: () {
-                                  _lastSceneIndex = -1;
+                                  _lastSceneIndex = 0;
                                   _progressController.reset();
+                                  TtsService().stop();
                                   context.read<StoryBloc>().add(ReplayStoryEvent());
+                                  _playCurrentSceneAudio(state.copyWith(currentSceneIndex: 0, isPlaying: true));
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
@@ -318,16 +362,56 @@ class _StoryScreenState extends State<StoryScreen>
                                 color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
                               ),
                               const SizedBox(width: 6),
-                              // زر تشغيل / إيقاف (أيقونة)
+                              // Action button.
                               InkWell(
                                 borderRadius: BorderRadius.circular(16),
-                                onTap: () => context.read<StoryBloc>().add(ToggleStoryPlayPauseEvent()),
+                                onTap: () {
+                                  final isPlayingNow = !state.isPlaying;
+                                  context.read<StoryBloc>().add(ToggleStoryPlayPauseEvent());
+                                  if (isPlayingNow) {
+                                    if (_progressController.value < 1.0) {
+                                      _progressController.forward();
+                                    }
+                                    if (TtsService().isPaused) {
+                                      TtsService().resume();
+                                    } else {
+                                      _playCurrentSceneAudio(state);
+                                    }
+                                  } else {
+                                    _progressController.stop();
+                                    TtsService().pause();
+                                  }
+                                },
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
                                   child: Icon(
                                     state.isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                                     size: 22,
                                     color: state.isPlaying ? AppColors.sageGreen : AppColors.terracottaOrange,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                width: 1,
+                                height: 16,
+                                color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                              ),
+                              const SizedBox(width: 6),
+                              // Action button - Mute / Unmute toggle
+                              InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () {
+                                  setState(() {
+                                    TtsService().toggleMute();
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5),
+                                  child: Icon(
+                                    TtsService().isMuted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+                                    size: 20,
+                                    color: TtsService().isMuted ? AppColors.terracottaOrange : AppColors.qortColor,
                                   ),
                                 ),
                               ),
@@ -342,7 +426,7 @@ class _StoryScreenState extends State<StoryScreen>
 
               const SizedBox(height: 12),
 
-              // زر المشهد التالي / متابعة الأساسي
+              // Action button.
               AppButton(
                 text: currentIndex + 1 >= totalScenes ? 'إنهاء القصة والتحدي' : 'متابعة المشهد',
                 variant: AppButtonVariant.primary,

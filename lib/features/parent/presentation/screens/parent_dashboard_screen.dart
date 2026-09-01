@@ -12,8 +12,6 @@ import 'habit_progress_report_screen.dart';
 import 'home_activities_screen.dart';
 import 'subscription_screen.dart';
 
-/// 2. لوحة التحكم الرئيسية لولي الأمر (Parent Dashboard)
-/// نظرة سريعة على صورة الطفل، العالم الحالي، وآخر تقدم مع روابط الأقسام
 class ParentDashboardScreen extends StatelessWidget {
   const ParentDashboardScreen({super.key});
 
@@ -28,7 +26,7 @@ class ParentDashboardScreen extends StatelessWidget {
           subtitle: 'متابعة البطل ${state.childName} (${state.childAge} سنوات)',
           showBackButton: false,
           actions: [
-            // زر الاشتراك
+            // Action button.
             InkWell(
               onTap: () {
                 Navigator.of(context).push(
@@ -61,7 +59,7 @@ class ParentDashboardScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: 8),
 
-                // بطاقة الطفل المرتبط والكود الفريد
+                // Information card.
                 AppCard(
                   backgroundColor: isDark ? AppColors.darkSurface : const Color(0xFFF6F3EE),
                   borderWidth: 1,
@@ -137,7 +135,7 @@ class ParentDashboardScreen extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // بطاقة ملخص تقدم الطفل الحالي
+                // Information card.
                 AppCard(
                   backgroundColor: isDark ? AppColors.darkSurface : AppColors.pureWhite,
                   borderWidth: 1,
@@ -183,7 +181,7 @@ class ParentDashboardScreen extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                // إحصائيات العادات الـ 30 السريعة
+                // Key performance indicators and metrics.
                 Row(
                   children: [
                     Expanded(
@@ -265,7 +263,6 @@ class ParentDashboardScreen extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // أقسام التنقل السريع لولي الأمر
                 Text(
                   'أدوات المتابعة والدعم الأسري',
                   style: AppTypography.titleSmall.copyWith(
@@ -274,7 +271,6 @@ class ParentDashboardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
 
-                // 1. تقرير العادات الـ 30
                 AppCard(
                   padding: const EdgeInsets.all(16),
                   onTap: () {
@@ -335,7 +331,6 @@ class ParentDashboardScreen extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // 2. الأنشطة المنزلية
                 AppCard(
                   padding: const EdgeInsets.all(16),
                   onTap: () {
@@ -396,7 +391,7 @@ class ParentDashboardScreen extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // 3. شاشة الاشتراك
+                // Subscription and membership tiers screen.
                 AppCard(
                   padding: const EdgeInsets.all(16),
                   onTap: () {

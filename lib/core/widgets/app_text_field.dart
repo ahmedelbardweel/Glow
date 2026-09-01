@@ -3,7 +3,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_typography.dart';
 
-/// حقل إدخال موحد لكافة شاشات التطبيق يعتمد على AppRadius
+/// Input field.
 class AppTextField extends StatelessWidget {
   final String? label;
   final String? hint;

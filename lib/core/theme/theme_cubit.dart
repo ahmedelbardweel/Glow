@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../database/hive_service.dart';
 import '../database/hive_keys.dart';
 
-/// إدارة حالة السمة (Light / Dark) باستخدام BLoC (Cubit)
 class ThemeCubit extends Cubit<ThemeMode> {
   ThemeCubit() : super(_getInitialTheme());
 

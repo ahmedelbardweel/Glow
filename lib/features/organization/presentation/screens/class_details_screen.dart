@@ -8,8 +8,7 @@ import '../../../../core/widgets/app_progress_bar.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../bloc/org_bloc.dart';
 
-/// 4. شاشة تفاصيل الفصول (Classes & Section Details)
-/// استعراض الفصول الدراسية مع تفاصيل كل فصل كعدد الطلاب ومتوسط الإنجاز والعادات المكتسبة مقارنة بالهدف الكلي (18/30)
+/// Application feature screen.
 class ClassDetailsScreen extends StatelessWidget {
   const ClassDetailsScreen({super.key});
 

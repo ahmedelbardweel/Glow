@@ -2,11 +2,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 
-/// نموذج شخصية الرفيق في الرحلة
+/// Domain data model.
 class CharacterModel {
   final String id;
-  final String name; // PORT, MORT, FORT, SORT, QORT
-  final String title; // القائد، الشجاع، الحكيم، المبتكر، المغامر
+  final String name; // PORT, MORT, FORT, SORT, QORT, LORT
+  final String title;
   final String description;
   final Color themeColor;
 
@@ -57,7 +57,7 @@ class CharacterModel {
   ];
 }
 
-/// نموذج مشهد القصة
+/// Domain data model.
 class StorySceneModel {
   final int sceneIndex;
   final String speakerName;
@@ -72,9 +72,45 @@ class StorySceneModel {
     required this.sceneDescription,
     required this.backgroundTheme,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'sceneIndex': sceneIndex,
+      'speakerName': speakerName,
+      'dialogue': dialogue,
+      'sceneDescription': sceneDescription,
+      'backgroundTheme': backgroundTheme,
+    };
+  }
+
+  factory StorySceneModel.fromMap(Map<dynamic, dynamic> map) {
+    return StorySceneModel(
+      sceneIndex: (map['sceneIndex'] as num?)?.toInt() ?? 0,
+      speakerName: map['speakerName']?.toString() ?? 'PORT',
+      dialogue: map['dialogue']?.toString() ?? '',
+      sceneDescription: map['sceneDescription']?.toString() ?? '',
+      backgroundTheme: map['backgroundTheme']?.toString() ?? 'forest_day',
+    );
+  }
+
+  StorySceneModel copyWith({
+    int? sceneIndex,
+    String? speakerName,
+    String? dialogue,
+    String? sceneDescription,
+    String? backgroundTheme,
+  }) {
+    return StorySceneModel(
+      sceneIndex: sceneIndex ?? this.sceneIndex,
+      speakerName: speakerName ?? this.speakerName,
+      dialogue: dialogue ?? this.dialogue,
+      sceneDescription: sceneDescription ?? this.sceneDescription,
+      backgroundTheme: backgroundTheme ?? this.backgroundTheme,
+    );
+  }
 }
 
-/// نموذج خيار السؤال
+/// Domain data model.
 class QuizOptionModel {
   final String keyId; // A, B, C, D
   final String text;
@@ -85,9 +121,25 @@ class QuizOptionModel {
     required this.text,
     required this.explanation,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'keyId': keyId,
+      'text': text,
+      'explanation': explanation,
+    };
+  }
+
+  factory QuizOptionModel.fromMap(Map<dynamic, dynamic> map) {
+    return QuizOptionModel(
+      keyId: map['keyId']?.toString() ?? 'A',
+      text: map['text']?.toString() ?? '',
+      explanation: map['explanation']?.toString() ?? '',
+    );
+  }
 }
 
-/// نموذج سؤال المهمة
+/// Domain data model.
 class QuizModel {
   final String situation;
   final String question;
@@ -104,9 +156,34 @@ class QuizModel {
     required this.encouragementCorrect,
     required this.gentleFeedbackWrong,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'situation': situation,
+      'question': question,
+      'options': options.map((o) => o.toMap()).toList(),
+      'correctKeyId': correctKeyId,
+      'encouragementCorrect': encouragementCorrect,
+      'gentleFeedbackWrong': gentleFeedbackWrong,
+    };
+  }
+
+  factory QuizModel.fromMap(Map<dynamic, dynamic> map) {
+    final rawOptions = map['options'] as List<dynamic>? ?? [];
+    return QuizModel(
+      situation: map['situation']?.toString() ?? '',
+      question: map['question']?.toString() ?? '',
+      options: rawOptions
+          .map((item) => QuizOptionModel.fromMap(Map<dynamic, dynamic>.from(item as Map)))
+          .toList(),
+      correctKeyId: map['correctKeyId']?.toString() ?? 'A',
+      encouragementCorrect: map['encouragementCorrect']?.toString() ?? 'أحسنت يا بطل!',
+      gentleFeedbackWrong: map['gentleFeedbackWrong']?.toString() ?? 'محاولة جيدة، تذكر دائماً السلوك الإيجابي!',
+    );
+  }
 }
 
-/// نموذج المهمة التعليمية
+/// Domain data model.
 class MissionModel {
   final String id;
   final int number;
@@ -129,9 +206,73 @@ class MissionModel {
     required this.storyScenes,
     required this.quiz,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'number': number,
+      'title': title,
+      'habitName': habitName,
+      'habitDescription': habitDescription,
+      'rewardStars': rewardStars,
+      'rewardPoints': rewardPoints,
+      'storyScenes': storyScenes.map((s) => s.toMap()).toList(),
+      'quiz': quiz.toMap(),
+    };
+  }
+
+  factory MissionModel.fromMap(Map<dynamic, dynamic> map) {
+    final rawScenes = (map['storyScenes'] ?? map['story_scenes']) as List<dynamic>? ?? [];
+    return MissionModel(
+      id: map['id']?.toString() ?? 'm_${DateTime.now().millisecondsSinceEpoch}',
+      number: (map['number'] as num?)?.toInt() ?? 1,
+      title: map['title']?.toString() ?? 'مهمة جديدة',
+      habitName: map['habitName']?.toString() ?? map['habit_name']?.toString() ?? 'عادة إيجابية',
+      habitDescription: map['habitDescription']?.toString() ?? map['habit_description']?.toString() ?? '',
+      rewardStars: (map['rewardStars'] as num?)?.toInt() ?? (map['reward_stars'] as num?)?.toInt() ?? 3,
+      rewardPoints: (map['rewardPoints'] as num?)?.toInt() ?? (map['reward_points'] as num?)?.toInt() ?? 150,
+      storyScenes: rawScenes
+          .map((item) => StorySceneModel.fromMap(Map<dynamic, dynamic>.from(item as Map)))
+          .toList(),
+      quiz: map['quiz'] != null
+          ? QuizModel.fromMap(Map<dynamic, dynamic>.from(map['quiz'] as Map))
+          : const QuizModel(
+              situation: '',
+              question: '',
+              options: [],
+              correctKeyId: 'A',
+              encouragementCorrect: '',
+              gentleFeedbackWrong: '',
+            ),
+    );
+  }
+
+  MissionModel copyWith({
+    String? id,
+    int? number,
+    String? title,
+    String? habitName,
+    String? habitDescription,
+    int? rewardStars,
+    int? rewardPoints,
+    List<StorySceneModel>? storyScenes,
+    QuizModel? quiz,
+  }) {
+    return MissionModel(
+      id: id ?? this.id,
+      number: number ?? this.number,
+      title: title ?? this.title,
+      habitName: habitName ?? this.habitName,
+      habitDescription: habitDescription ?? this.habitDescription,
+      rewardStars: rewardStars ?? this.rewardStars,
+      rewardPoints: rewardPoints ?? this.rewardPoints,
+      storyScenes: storyScenes ?? this.storyScenes,
+      quiz: quiz ?? this.quiz,
+    );
+  }
 }
 
-/// نموذج العالم
+/// Domain data model.
 class WorldModel {
   final int worldNumber;
   final String name;
@@ -148,11 +289,68 @@ class WorldModel {
     this.isPremium = false,
     required this.missions,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'worldNumber': worldNumber,
+      'name': name,
+      'description': description,
+      // ignore: deprecated_member_use
+      'worldColorHex': '#${worldColor.value.toRadixString(16).padLeft(8, '0')}',
+      'isPremium': isPremium,
+      'missions': missions.map((m) => m.toMap()).toList(),
+    };
+  }
+
+  factory WorldModel.fromMap(Map<dynamic, dynamic> map) {
+    final rawMissions = map['missions'] as List<dynamic>? ?? [];
+    Color color = AppColors.mintGreen;
+    if (map['worldColorHex'] != null) {
+      try {
+        final hex = map['worldColorHex'].toString().replaceAll('#', '');
+        color = Color(int.parse(hex, radix: 16));
+      } catch (_) {}
+    } else if (map['world_color_hex'] != null) {
+      try {
+        final hex = map['world_color_hex'].toString().replaceAll('#', '');
+        color = Color(int.parse(hex.length == 6 ? 'FF$hex' : hex, radix: 16));
+      } catch (_) {}
+    }
+
+    return WorldModel(
+      worldNumber: (map['worldNumber'] as num?)?.toInt() ?? (map['world_number'] as num?)?.toInt() ?? 1,
+      name: map['name']?.toString() ?? 'عالم جديد',
+      description: map['description']?.toString() ?? '',
+      worldColor: color,
+      isPremium: map['isPremium'] == true || map['is_premium'] == true,
+      missions: rawMissions
+          .map((item) => MissionModel.fromMap(Map<dynamic, dynamic>.from(item as Map)))
+          .toList(),
+    );
+  }
+
+  WorldModel copyWith({
+    int? worldNumber,
+    String? name,
+    String? description,
+    Color? worldColor,
+    bool? isPremium,
+    List<MissionModel>? missions,
+  }) {
+    return WorldModel(
+      worldNumber: worldNumber ?? this.worldNumber,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      worldColor: worldColor ?? this.worldColor,
+      isPremium: isPremium ?? this.isPremium,
+      missions: missions ?? this.missions,
+    );
+  }
 }
 
-/// نموذج بيانات الطفل
+/// Domain data model.
 class ChildProfileModel {
-  final String childId; // كود الطفل الفريد التلقائي (مثل: PORT-7842)
+  final String childId;
   final String name;
   final int age;
   final String avatarShape;
@@ -203,15 +401,15 @@ class ChildProfileModel {
     return ChildProfileModel(
       childId: map['childId'] ?? map['child_code'] ?? generateUniqueChildId(),
       name: map['name'] ?? 'بطل PORT',
-      age: map['age'] ?? 7,
-      avatarShape: map['avatarShape'] ?? 'shape_1',
-      selectedCharacter: map['selectedCharacter'] ?? 'PORT',
-      currentWorld: map['currentWorld'] ?? 1,
-      stars: map['stars'] ?? 0,
-      points: map['points'] ?? 0,
-      completedMissions: List<String>.from(map['completedMissions'] ?? []),
-      earnedBadges: List<String>.from(map['earnedBadges'] ?? []),
-      parentEmail: map['parentEmail'] ?? map['parent_id'],
+      age: (map['age'] as num?)?.toInt() ?? 7,
+      avatarShape: map['avatarShape']?.toString() ?? 'shape_1',
+      selectedCharacter: map['selectedCharacter']?.toString() ?? 'PORT',
+      currentWorld: (map['currentWorld'] as num?)?.toInt() ?? (map['current_world'] as num?)?.toInt() ?? 1,
+      stars: (map['stars'] as num?)?.toInt() ?? 0,
+      points: (map['points'] as num?)?.toInt() ?? 0,
+      completedMissions: List<String>.from(map['completedMissions'] ?? map['completed_missions'] ?? []),
+      earnedBadges: List<String>.from(map['earnedBadges'] ?? map['earned_badges'] ?? []),
+      parentEmail: map['parentEmail']?.toString() ?? map['parent_id']?.toString(),
     );
   }
 
@@ -242,4 +440,74 @@ class ChildProfileModel {
       parentEmail: parentEmail ?? this.parentEmail,
     );
   }
+}
+
+/// Domain data model.
+class AnnouncementModel {
+  final String id;
+  final String title;
+  final String content;
+  final String targetRole; // all, child, parent, organization
+  final bool isActive;
+  final DateTime createdAt;
+
+  const AnnouncementModel({
+    required this.id,
+    required this.title,
+    required this.content,
+    this.targetRole = 'all',
+    this.isActive = true,
+    required this.createdAt,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'content': content,
+      'targetRole': targetRole,
+      'isActive': isActive,
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
+
+  factory AnnouncementModel.fromMap(Map<dynamic, dynamic> map) {
+    return AnnouncementModel(
+      id: map['id']?.toString() ?? '',
+      title: map['title']?.toString() ?? '',
+      content: map['content']?.toString() ?? '',
+      targetRole: map['target_role']?.toString() ?? map['targetRole']?.toString() ?? 'all',
+      isActive: map['is_active'] == true || map['isActive'] == true,
+      createdAt: map['created_at'] != null
+          ? DateTime.tryParse(map['created_at'].toString()) ?? DateTime.now()
+          : (map['createdAt'] != null
+              ? DateTime.tryParse(map['createdAt'].toString()) ?? DateTime.now()
+              : DateTime.now()),
+    );
+  }
+}
+
+/// Key performance indicators and metrics.
+class AdminStatsModel {
+  final int totalChildren;
+  final int totalParents;
+  final int totalOrganizations;
+  final int totalCompletedMissions;
+  final int totalStarsGiven;
+  final int totalPointsGiven;
+  final int totalCustomWorlds;
+  final int totalCustomMissions;
+  final bool isSupabaseConnected;
+
+  const AdminStatsModel({
+    this.totalChildren = 0,
+    this.totalParents = 0,
+    this.totalOrganizations = 0,
+    this.totalCompletedMissions = 0,
+    this.totalStarsGiven = 0,
+    this.totalPointsGiven = 0,
+    this.totalCustomWorlds = 0,
+    this.totalCustomMissions = 0,
+    this.isSupabaseConnected = false,
+  });
 }

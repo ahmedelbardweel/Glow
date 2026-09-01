@@ -11,8 +11,7 @@ import '../../data/models/child_models.dart';
 import '../bloc/child_bloc.dart';
 import 'reward_progress_screen.dart';
 
-/// 13. شاشة نتيجة المهمة (Mission Result)
-/// تلخيص إنجاز المهمة بعرض النجوم، النقاط المكتسبة، واسم العادة الجديدة التي تم ترسيخها
+/// Application feature screen.
 class MissionResultScreen extends StatefulWidget {
   final MissionModel mission;
 
@@ -50,7 +49,6 @@ class _MissionResultScreenState extends State<MissionResultScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // رفيق الرحلة
               const Center(
                 child: PortShapeAvatar(
                   characterName: 'PORT',
@@ -60,7 +58,7 @@ class _MissionResultScreenState extends State<MissionResultScreen> {
               ),
               const SizedBox(height: 20),
 
-              // بطاقة تفاصيل النتيجة
+              // Information card.
               AppCard(
                 backgroundColor: isDark ? AppColors.darkSurface : AppColors.pureWhite,
                 borderWidth: 1,
@@ -83,7 +81,6 @@ class _MissionResultScreenState extends State<MissionResultScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // وسام العادة المكتسبة
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       decoration: BoxDecoration(
@@ -101,7 +98,6 @@ class _MissionResultScreenState extends State<MissionResultScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // المكافآت المكتسبة
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -145,7 +141,7 @@ class _MissionResultScreenState extends State<MissionResultScreen> {
 
               const SizedBox(height: 28),
 
-              // زر المتابعة لشاشة المكافآت والشخصية
+              // Character selection screen.
               AppButton(
                 text: 'استعراض الشارات والتقدم الكامل',
                 variant: AppButtonVariant.primary,

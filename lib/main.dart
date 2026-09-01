@@ -9,19 +9,20 @@ import 'features/child/presentation/bloc/quiz_bloc.dart';
 import 'features/child/presentation/bloc/story_bloc.dart';
 import 'features/organization/presentation/bloc/org_bloc.dart';
 import 'features/parent/presentation/bloc/parent_bloc.dart';
+import 'features/admin/presentation/bloc/admin_bloc.dart';
 import 'features/splash_and_auth/presentation/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // تهيئة قاعدة البيانات المحلية Hive والمزامنة السحابية Offline-First مع Supabase
+  // Initialize local persistence and trigger background synchronization
   await HiveService.init();
   await OfflineFirstSyncManager.initializeAndSync();
 
   runApp(const PortApp());
 }
 
-/// تطبيق PORT - بناء العادات والقيم للأطفال والأسر والمنظمات التعليمية
+/// Root application widget.
 class PortApp extends StatelessWidget {
   const PortApp({super.key});
 
@@ -47,13 +48,16 @@ class PortApp extends StatelessWidget {
         BlocProvider<OrgBloc>(
           create: (_) => OrgBloc()..add(LoadOrgDataEvent()),
         ),
+        BlocProvider<AdminBloc>(
+          create: (_) => AdminBloc(),
+        ),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
           return MaterialApp(
-            title: 'PORT - تطبيق العادات والقيم',
+            title: 'GLOW',
             debugShowCheckedModeBanner: false,
-            // اتجاه الواجهة من اليمين لليسار (RTL) للغة العربية
+            // Right-to-left layout direction for Arabic typography
             builder: (context, child) {
               return Directionality(
                 textDirection: TextDirection.rtl,

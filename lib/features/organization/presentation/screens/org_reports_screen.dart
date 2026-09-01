@@ -11,8 +11,6 @@ import '../../../../core/widgets/app_dialog.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../bloc/org_bloc.dart';
 
-/// 5. تقارير المنظمة (Organization Reports)
-/// تحليلات شاملة لأكثر العادات اكتساباً والعادات الأضعف مع إمكانية تحميل تقارير PDF
 class OrgReportsScreen extends StatefulWidget {
   const OrgReportsScreen({super.key});
 
@@ -21,7 +19,7 @@ class OrgReportsScreen extends StatefulWidget {
 }
 
 class _OrgReportsScreenState extends State<OrgReportsScreen> {
-  String _selectedPeriod = 'شهري'; // أسبوعي، شهري، سنوي
+  String _selectedPeriod = 'شهري';
 
   void _onDownloadPdf() async {
     final fileName = await CloudSyncService.generatePdfReportCloud(
@@ -55,7 +53,6 @@ class _OrgReportsScreenState extends State<OrgReportsScreen> {
               children: [
                 const SizedBox(height: 8),
 
-                // فترة التقرير
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: ['أسبوعي', 'شهري', 'سنوي'].map((period) {
@@ -70,7 +67,6 @@ class _OrgReportsScreenState extends State<OrgReportsScreen> {
 
                 const SizedBox(height: 16),
 
-                // قسم العادات الأكثر اكتساباً (نقاط القوة بالمدرسة)
                 AppCard(
                   backgroundColor: isDark ? AppColors.darkSurface : AppColors.mintGreen.withValues(alpha: 0.08),
                   borderColor: AppColors.mintGreen,
@@ -113,7 +109,6 @@ class _OrgReportsScreenState extends State<OrgReportsScreen> {
 
                 const SizedBox(height: 14),
 
-                // قسم العادات الأضعف (تحتاج دعم وتوجيه المعلمين)
                 AppCard(
                   backgroundColor: isDark ? AppColors.darkSurface : AppColors.coralOrange.withValues(alpha: 0.08),
                   borderColor: AppColors.coralOrange,
@@ -156,7 +151,7 @@ class _OrgReportsScreenState extends State<OrgReportsScreen> {
 
                 const SizedBox(height: 24),
 
-                // زر تحميل تقرير PDF
+                // Action button.
                 AppButton(
                   text: 'تحميل تقرير $_selectedPeriod بصيغة PDF',
                   customColor: AppColors.lavenderPurple,

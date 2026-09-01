@@ -12,8 +12,8 @@ import '../../data/repositories/child_repository.dart';
 import '../bloc/child_bloc.dart';
 import 'world_map_screen.dart';
 
-/// 14 & 15. شاشة المكافأة والشخصية والتقدم (Reward, Character & Progress)
-/// استعراض الشارات، تطور الشخصية، والعوالم المفتوحة ونسبة الإنجاز الكلية
+/// Character selection screen.
+/// Interactive 3D character component.
 class RewardProgressScreen extends StatelessWidget {
   const RewardProgressScreen({super.key});
 
@@ -32,7 +32,7 @@ class RewardProgressScreen extends StatelessWidget {
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // بطاقة تطور الشخصية والمستوى
+              // Information card.
               AppCard(
                 backgroundColor: isDark ? AppColors.darkSurface : AppColors.pureWhite,
                 borderWidth: 1,
@@ -73,7 +73,6 @@ class RewardProgressScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              // قسم الشارات المكتسبة
               Text(
                 'الأوسمة والشارات المكتسبة (${badges.length})',
                 style: AppTypography.titleSmall.copyWith(
@@ -145,7 +144,7 @@ class RewardProgressScreen extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              // زر العودة للخريطة
+              // Action button.
               AppButton(
                 text: 'العودة إلى خريطة العوالم',
                 variant: AppButtonVariant.primary,

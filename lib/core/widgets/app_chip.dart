@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 
-/// خيار تصنيفي أو شريحة تفاعلية موحدة تعتمد على AppRadius
 class AppChip extends StatelessWidget {
   final String label;
   final bool isSelected;

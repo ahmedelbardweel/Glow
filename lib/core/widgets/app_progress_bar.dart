@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 
-/// شريط تقدم مخصص وناعم للأطفال يعتمد على AppRadius
 class AppProgressBar extends StatelessWidget {
   final double value; // 0.0 to 1.0
   final double height;

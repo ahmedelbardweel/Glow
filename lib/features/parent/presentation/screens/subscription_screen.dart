@@ -9,8 +9,8 @@ import '../../../../core/widgets/app_dialog.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../bloc/parent_bloc.dart';
 
-/// 5. شاشة الاشتراك (Subscription Screen)
-/// تظهر عند الوصول للعالم 4 أو 5 لعرض الخطط والمميزات وضمان حفظ تقدم الطفل تماماً
+/// Subscription and membership tiers screen.
+/// Persists state changes.
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
 
@@ -53,7 +53,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               children: [
                 const SizedBox(height: 8),
 
-                // لافتة الضمان والحفظ
+                // Persists state changes.
                 AppCard(
                   backgroundColor: isDark ? AppColors.darkSurface : AppColors.lavenderPurple.withValues(alpha: 0.1),
                   borderColor: AppColors.lavenderPurple,
@@ -87,7 +87,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
                 const SizedBox(height: 16),
 
-                // الخطة السنوية
+                // Typography scale tokens.
                 AppCard(
                   borderColor: _selectedPlan == 'yearly' ? AppColors.sunnyYellow : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
                   borderWidth: _selectedPlan == 'yearly' ? 2.5 : 1,
@@ -140,7 +140,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
                 const SizedBox(height: 12),
 
-                // الخطة الشهرية
+                // Typography scale tokens.
                 AppCard(
                   borderColor: _selectedPlan == 'monthly' ? AppColors.primaryBlue : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
                   borderWidth: _selectedPlan == 'monthly' ? 2.5 : 1,
@@ -177,7 +177,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
                 const SizedBox(height: 24),
 
-                // زر تأكيد الاشتراك
+                // Action button.
                 AppButton(
                   text: state.isSubscribed ? 'أنت مشترك بالفعل (تعديل الخطة)' : 'تأكيد الاشتراك وتفعيل الميزات',
                   variant: AppButtonVariant.primary,

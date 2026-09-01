@@ -7,8 +7,7 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../bloc/parent_bloc.dart';
 
-/// 4. شاشة النشاط المنزلي (Home Activities)
-/// تقديم أفكار وأنشطة عملية يقدمها ولي الأمر لطفله في الواقع لربط التطبيق بالحياة اليومية
+/// Practical home activities screen.
 class HomeActivitiesScreen extends StatelessWidget {
   const HomeActivitiesScreen({super.key});
 

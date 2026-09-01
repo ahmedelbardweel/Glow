@@ -10,8 +10,7 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../data/models/org_models.dart';
 import '../bloc/org_bloc.dart';
 
-/// 3. شاشة إدارة الطلاب (Students Management)
-/// قائمة بجميع طلاب المنظمة مع محرك بحث سريع وإمكانية إضافة طلاب جدد
+/// Application feature screen.
 class StudentsManagementScreen extends StatelessWidget {
   const StudentsManagementScreen({super.key});
 
@@ -84,7 +83,7 @@ class StudentsManagementScreen extends StatelessWidget {
           title: 'إدارة الطلاب (${students.length})',
           subtitle: 'قوائم الطلاب ونسب الإنجاز والعادات',
           actions: [
-            // زر إضافة طالب
+            // Action button.
             InkWell(
               onTap: () => _showAddStudentDialog(context),
               borderRadius: AppRadius.all,
@@ -107,7 +106,7 @@ class StudentsManagementScreen extends StatelessWidget {
           ],
           body: Column(
             children: [
-              // حقل البحث السريع
+              // Input field.
               AppTextField(
                 hint: 'بحث باسم الطالب أو الفصل...',
                 onChanged: (val) {
@@ -117,7 +116,6 @@ class StudentsManagementScreen extends StatelessWidget {
 
               const SizedBox(height: 12),
 
-              // قائمة الطلاب
               Expanded(
                 child: ListView.separated(
                   itemCount: students.length,

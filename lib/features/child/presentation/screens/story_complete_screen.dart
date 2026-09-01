@@ -9,8 +9,7 @@ import '../../../../core/widgets/shapes/port_shape_avatar.dart';
 import '../../data/models/child_models.dart';
 import 'quiz_screen.dart';
 
-/// 9. شاشة الانتقال للأسئلة (Story Complete)
-/// رسالة تشجيعية دافئة ومبهجة من الرفيق للانطلاق إلى لعبة الأسئلة بدون أي إيموجي
+/// Interactive story narration screen.
 class StoryCompleteScreen extends StatelessWidget {
   final MissionModel mission;
 
@@ -32,7 +31,7 @@ class StoryCompleteScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // الشخصية المحفزة مع هالة دافئة
+              // Interactive 3D character component.
               const Center(
                 child: PortShapeAvatar(
                   characterName: 'PORT',
@@ -42,7 +41,7 @@ class StoryCompleteScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // بطاقة الرسالة التحفيزية
+              // Information card.
               AppCard(
                 backgroundColor: isDark ? AppColors.darkSurface : AppColors.pureWhite,
                 borderWidth: 1,
@@ -79,7 +78,7 @@ class StoryCompleteScreen extends StatelessWidget {
 
               const SizedBox(height: 28),
 
-              // زر بدء التحدي الكبير
+              // Action button.
               AppButton(
                 text: 'نعم! أنا جاهز للتحدي الذكي',
                 variant: AppButtonVariant.primary,

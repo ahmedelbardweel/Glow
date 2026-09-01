@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// طباعة ونصوص التطبيق بتنسيق عربي ناعم وهندسي مريح للأطفال
 class AppTypography {
   AppTypography._();
 

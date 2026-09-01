@@ -16,8 +16,8 @@ import 'mission_selection_screen.dart';
 import 'reward_progress_screen.dart';
 import 'world_screen.dart';
 
-/// 5. شاشة خريطة العوالم التفاعلية (World Map Screen)
-/// تدعم التبديل السلس بين عرض الكروت التفصيلي وخريطة المغامرة التفاعلية (مسار الجزر)
+/// Interactive world map exploration screen.
+/// Action button.
 class WorldMapScreen extends StatefulWidget {
   const WorldMapScreen({super.key});
 
@@ -26,7 +26,7 @@ class WorldMapScreen extends StatefulWidget {
 }
 
 class _WorldMapScreenState extends State<WorldMapScreen> {
-  bool _isMapView = false; // التبديل بين عرض الكروت (false) وعرض الخريطة التفاعلية (true)
+  bool _isMapView = false;
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +45,9 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
           customHeader: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // الصف الأول: التحية والرفيق وزر الأوسمة وزر الخريطة وزر الثيم
+              // Action button.
               Row(
                 children: [
-                  // صورة الرفيق الرمزية
                   PortShapeAvatar(
                     characterName: profile.selectedCharacter,
                     size: 40,
@@ -56,7 +55,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                   ),
                   const SizedBox(width: 8),
 
-                  // التحية والرتبة والكود
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,7 +118,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  // عداد النجوم الذهبية
                   Container(
                     height: 30,
                     padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -149,7 +146,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                     ),
                   ),
                   const SizedBox(width: 3),
-                  // عداد النقاط
                   Container(
                     height: 30,
                     padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -178,7 +174,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  // زر أوسمتي
+                  // Action button.
                   InkWell(
                     onTap: () {
                       Navigator.of(context).push(
@@ -216,7 +212,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  // زر تبديل الثيم
+                  // Action button.
                   InkWell(
                     onTap: () => context.read<ThemeCubit>().toggleTheme(),
                     borderRadius: BorderRadius.circular(AppRadius.cardRadiusValue),
@@ -245,10 +241,8 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
           ),
           body: Column(
             children: [
-              // شريط التبديل بين الخريطة والكروت أعلى الجسم (Body)
               _buildViewToggleHeader(isDark),
 
-              // المحتوى المختار
               Expanded(
                 child: _isMapView
                     ? _buildInteractiveAdventureMapView(
@@ -260,7 +254,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                       )
                     : ListView.builder(
                         physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 10),
                         itemCount: worlds.length,
                         itemBuilder: (context, index) {
                           final world = worlds[index];
@@ -269,7 +263,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                           final isPremium = world.isPremium;
 
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: 18),
+                            padding: const EdgeInsets.only(bottom: 20),
                             child: _buildWorldIslandCard(
                               context: context,
                               world: world,
@@ -289,14 +283,13 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
     );
   }
 
-  /// شريط التبديل التفاعلي بين نمط الخريطة ونمط الكروت في أعلى الـ Body
   Widget _buildViewToggleHeader(bool isDark) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 10, 16, 6),
-      padding: const EdgeInsets.all(4),
+      margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      padding: const EdgeInsets.all(0),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : const Color(0xFFEFEBE4),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.cardRadiusValue),
         border: Border.all(
           color: isDark ? AppColors.darkBorder : const Color(0xFFDDD8D0),
           width: 1,
@@ -304,7 +297,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
       ),
       child: Row(
         children: [
-          // خيار خريطة المغامرة
           Expanded(
             child: InkWell(
               onTap: () {
@@ -312,7 +304,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                   setState(() => _isMapView = true);
                 }
               },
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.cardRadiusValue),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -321,7 +313,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                   color: _isMapView
                       ? AppColors.primaryBlue
                       : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.cardRadiusValue),
                   boxShadow: _isMapView
                       ? [
                           BoxShadow(
@@ -335,18 +327,10 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.explore_rounded,
-                      size: 16,
-                      color: _isMapView
-                          ? Colors.white
-                          : (isDark ? AppColors.darkTextSecondary : AppColors.textCharcoal),
-                    ),
-                    const SizedBox(width: 6),
                     Text(
                       'خريطة المغامرة',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: _isMapView
                             ? Colors.white
@@ -359,9 +343,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
             ),
           ),
 
-          const SizedBox(width: 4),
 
-          // خيار قائمة العوالم
           Expanded(
             child: InkWell(
               onTap: () {
@@ -369,16 +351,16 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                   setState(() => _isMapView = false);
                 }
               },
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.cardRadiusValue),
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 300),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: !_isMapView
                       ? AppColors.terracottaOrange
                       : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.cardRadiusValue),
                   boxShadow: !_isMapView
                       ? [
                           BoxShadow(
@@ -392,18 +374,10 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.view_agenda_rounded,
-                      size: 16,
-                      color: !_isMapView
-                          ? Colors.white
-                          : (isDark ? AppColors.darkTextSecondary : AppColors.textCharcoal),
-                    ),
-                    const SizedBox(width: 6),
                     Text(
                       'قائمة العوالم',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: !_isMapView
                             ? Colors.white
@@ -420,7 +394,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
     );
   }
 
-  /// بناء بطاقة جزيرة العالم المصورة والتفاعلية بدون إيموجي
+  /// Information card.
   Widget _buildWorldIslandCard({
     required BuildContext context,
     required WorldModel world,
@@ -441,7 +415,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // 1. المشهد الفني الكرتوني لبيئة العالم
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             child: SizedBox(
@@ -458,7 +431,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                     ),
                   ),
 
-                  // شارة رقم العالم
                   Positioned(
                     top: 12,
                     right: 12,
@@ -480,7 +452,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                     ),
                   ),
 
-                  // شارة الحالة (متاح الآن / مقفل / باقة التميز)
                   Positioned(
                     top: 12,
                     left: 12,
@@ -512,7 +483,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
             ),
           ),
 
-          // 2. تفاصيل العالم والمهام الخمس
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -544,7 +514,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
 
                 const SizedBox(height: 14),
 
-                // 3. مؤشرات المحطات الخمس المصممة هندسياً
                 if (isUnlocked) ...[
                   Container(
                     padding:
@@ -655,7 +624,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                   ),
                   const SizedBox(height: 14),
 
-                  // زر الدخول للعالم
+                  // Action button.
                   AppButton(
                     text: completedCount == totalCount
                         ? 'مراجعة مهمات العالم'
@@ -671,7 +640,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                     },
                   ),
                 ] else ...[
-                  // العالم مقفل
                   Container(
                     padding: const EdgeInsets.symmetric(
                         vertical: 12, horizontal: 16),
@@ -732,7 +700,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
     );
   }
 
-  /// بناء خريطة المغامرة التفاعلية ومسار الجزر (Interactive Trail Map)
+  /// Action button.
   Widget _buildInteractiveAdventureMapView({
     required BuildContext context,
     required List<WorldModel> worlds,
@@ -740,7 +708,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
     required String selectedCharacter,
     required bool isDark,
   }) {
-    // تحديد العالم الحالي الفعال الذي يقف عليه رفيق الطفل
     int currentActiveWorldNumber = 1;
     for (int i = 0; i < worlds.length; i++) {
       final w = worlds[i];
@@ -752,40 +719,10 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
       child: Column(
         children: [
-          // شريط إرشادي خفيف في أعلى الخريطة
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkSurfaceVariant : const Color(0xFFFAF6F0),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isDark ? AppColors.darkBorder : const Color(0xFFE5DFD7),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.explore_rounded, size: 16, color: AppColors.sageGreen),
-                const SizedBox(width: 6),
-                Text(
-                  'انقر على أي جزيرة مفتوحة لبدء التحديات والمغامرة!',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? AppColors.darkTextPrimary : AppColors.textCharcoal,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // مسار الجزر المتعرج (Winding Adventure Path)
+          // Action button.
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -799,24 +736,24 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
               final completedCount = worldMissions.where((m) => completedMissions.contains(m.id)).length;
               final isFullyCompleted = completedCount == worldMissions.length && worldMissions.isNotEmpty;
 
-              // محاذاة متعرجة للجزر (يمين، وسط، يسار، وسط، يمين...)
+              // Action button.
               Alignment nodeAlignment = Alignment.center;
               if (index % 4 == 0) {
-                nodeAlignment = const Alignment(-0.55, 0); // يسار
+                nodeAlignment = const Alignment(-0.55, 0);
               } else if (index % 4 == 1) {
-                nodeAlignment = Alignment.center; // وسط
+                nodeAlignment = Alignment.center;
               } else if (index % 4 == 2) {
-                nodeAlignment = const Alignment(0.55, 0); // يمين
+                nodeAlignment = const Alignment(0.55, 0);
               } else {
                 nodeAlignment = Alignment.center;
               }
 
               return Column(
                 children: [
-                  // خط الاتصال المتعرج بين الجزر
+                  // Action button.
                   if (index > 0)
                     CustomPaint(
-                      size: const Size(double.infinity, 45),
+                      size: const Size(double.infinity, 80),
                       painter: _AdventurePathPainter(
                         isDark: isDark,
                         isUnlocked: isUnlocked,
@@ -825,7 +762,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                       ),
                     ),
 
-                  // جزيرة العالم
                   Align(
                     alignment: nodeAlignment,
                     child: _buildAdventureWorldNode(
@@ -850,7 +786,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
     );
   }
 
-  /// بناء عقدة الجزيرة في الخريطة التفاعلية
   Widget _buildAdventureWorldNode({
     required BuildContext context,
     required WorldModel world,
@@ -868,7 +803,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // رفيق الطفل الواقف على الجزيرة الحالية
         if (isCurrentNode && isUnlocked) ...[
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -900,15 +834,15 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
             ),
           ),
           const SizedBox(height: 4),
-          PortShapeAvatar(
-            characterName: selectedCharacter,
-            size: 44,
-            showBadge: false,
-          ),
-          const SizedBox(height: 6),
+          // PortShapeAvatar(
+          //   characterName: selectedCharacter,
+          //   size: 44,
+          //   showBadge: false,
+          // ),
+          // const SizedBox(height: 6),
         ],
 
-        // الزر الدائري للجزيرة
+        // Action button.
         InkWell(
           onTap: isUnlocked
               ? () {
@@ -919,26 +853,16 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                   );
                 }
               : null,
-          borderRadius: BorderRadius.circular(50),
+          borderRadius: BorderRadius.circular(AppRadius.cardRadiusValue),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            width: isCurrentNode ? 96 : 84,
-            height: isCurrentNode ? 96 : 84,
+            width: isCurrentNode ? 60 : 100,
+            height: isCurrentNode ? 60 : 45,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isUnlocked
                   ? worldColor
                   : (isDark ? AppColors.darkSurfaceVariant : const Color(0xFFD6CECE)),
-              gradient: isUnlocked
-                  ? LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        worldColor.withValues(alpha: 0.85),
-                        worldColor,
-                      ],
-                    )
-                  : null,
               boxShadow: isUnlocked
                   ? [
                       BoxShadow(
@@ -952,7 +876,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                 color: isFullyCompleted
                     ? AppColors.warmGold
                     : (isCurrentNode
-                        ? Colors.white
+                        ? AppColors.coralOrange
                         : (isUnlocked ? Colors.white.withValues(alpha: 0.6) : Colors.transparent)),
                 width: isCurrentNode || isFullyCompleted ? 3.5 : 2.0,
               ),
@@ -961,7 +885,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
               alignment: Alignment.center,
               children: [
                 if (isUnlocked) ...[
-                  // محتوى الجزيرة المفتوحة
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -969,15 +892,8 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                         '${world.worldNumber}',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w900,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black26,
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       if (isFullyCompleted)
@@ -994,7 +910,6 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                     ],
                   ),
                 ] else ...[
-                  // الجزيرة المقفلة
                   Icon(
                     isPremium ? Icons.workspace_premium_rounded : Icons.lock_rounded,
                     size: 30,
@@ -1008,12 +923,11 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
 
         const SizedBox(height: 6),
 
-        // اسم العالم
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           decoration: BoxDecoration(
             color: isDark ? AppColors.darkSurfaceVariant : Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(AppRadius.cardRadiusValue),
             border: Border.all(
               color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
               width: 1,
@@ -1022,7 +936,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
           child: Text(
             world.name,
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: isUnlocked
                   ? (isDark ? AppColors.darkTextPrimary : AppColors.textCharcoal)
@@ -1035,7 +949,7 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
   }
 }
 
-/// رسام المسار المنقط والمموج بين جزر المغامرة
+/// Action button.
 class _AdventurePathPainter extends CustomPainter {
   final bool isDark;
   final bool isUnlocked;
@@ -1073,7 +987,7 @@ class _AdventurePathPainter extends CustomPainter {
       size.height,
     );
 
-    // رسم المسار كخط متقطع جميل
+    // Typography scale tokens.
     canvas.drawPath(path, paint);
   }
 

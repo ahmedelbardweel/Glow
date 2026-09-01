@@ -12,7 +12,7 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../bloc/parent_bloc.dart';
 import 'parent_dashboard_screen.dart';
 
-/// 1. بوابة ولي الأمر وربط الطفل عبر الكود الفريد (Child ID Linking)
+/// Child adventure portal.
 class ParentAuthScreen extends StatefulWidget {
   const ParentAuthScreen({super.key});
 
@@ -32,7 +32,6 @@ class _ParentAuthScreenState extends State<ParentAuthScreen> {
     final savedEmail = HiveService.getSetting<String>(HiveKeys.parentEmailKey, defaultValue: 'parent@portapp.com');
     final linkedId = HiveService.getSetting<String>(HiveKeys.linkedChildIdKey, defaultValue: '');
 
-    // فحص ما إذا كان هناك طفل مسجل على هذا الجهاز
     final localChild = HiveService.getChildData<Map>(HiveKeys.childProfileKey);
     if (localChild != null) {
       _detectedLocalChildId = localChild['childId']?.toString();
@@ -86,7 +85,6 @@ class _ParentAuthScreenState extends State<ParentAuthScreen> {
           children: [
             const SizedBox(height: 8),
 
-            // لافتة إرشادية لشرح نظام الكود الفريد (Child ID)
             AppCard(
               backgroundColor: isDark ? AppColors.darkSurface : AppColors.softMintBackground,
               borderColor: AppColors.sageGreen.withValues(alpha: 0.4),
@@ -131,7 +129,7 @@ class _ParentAuthScreenState extends State<ParentAuthScreen> {
 
             const SizedBox(height: 20),
 
-            // حقل البريد الإلكتروني لولي الأمر
+            // Input field.
             AppTextField(
               label: 'البريد الإلكتروني لولي الأمر',
               hint: 'parent@email.com',
@@ -141,14 +139,13 @@ class _ParentAuthScreenState extends State<ParentAuthScreen> {
 
             const SizedBox(height: 16),
 
-            // حقل كود الطفل الفريد (Child ID)
+            // Input field.
             AppTextField(
               label: 'كود الطفل الفريد (Child ID)',
               hint: 'مثال: PORT-8492',
               controller: _childIdController,
             ),
 
-            // اقتراح الكود المكتشف محلياً من نفس الجهاز
             if (_detectedLocalChildId != null) ...[
               const SizedBox(height: 8),
               InkWell(
@@ -199,7 +196,7 @@ class _ParentAuthScreenState extends State<ParentAuthScreen> {
 
             const SizedBox(height: 28),
 
-            // زر تأكيد الربط والدخول للوحة التحكم
+            // Action button.
             AppButton(
               text: 'ربط ودخول لوحة تحكم الأسرة',
               variant: AppButtonVariant.primary,

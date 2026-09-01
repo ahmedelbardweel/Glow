@@ -5,15 +5,15 @@ import 'supabase_service.dart';
 import '../../features/child/data/models/child_models.dart';
 import '../../features/child/data/repositories/child_repository.dart';
 
-/// المدير المركزي لمعمارية المزامنة السحابية والمحلية (Offline-First Sync Architecture)
-/// يربط بين سرعة Hive الفائقة محلياً وموثوقية Supabase السحابية كمرجع رئيسي
+/// Central coordinator for offline-first data synchronization.
+/// Balances local Hive performance with Supabase remote persistence.
 class OfflineFirstSyncManager {
   OfflineFirstSyncManager._();
 
   static bool _isSyncing = false;
   static bool get isSyncing => _isSyncing;
 
-  /// 1. تهيئة النظام وإجراء المزامنة الأولية التلقائية عند تشغيل التطبيق (Initial Fetch & Sync Down)
+  /// Initializes services and triggers initial background synchronization.
   static Future<void> initializeAndSync() async {
     await SupabaseService.init();
 
@@ -22,25 +22,33 @@ class OfflineFirstSyncManager {
         final currentProfile = ChildRepository.getChildProfile();
         await SupabaseService.upsertRemoteChildProfile(currentProfile);
       } catch (e) {
-        debugPrint('Initial profile sync warning: $e');
+        debugPrint('[Sync] Initial profile sync warning: $e');
       }
     }
 
-    // تشغيل المزامنة في الخلفية دون تعطيل واجهة المستخدم
     unawaited(syncDownFromCloud());
     unawaited(syncUpPendingQueue());
   }
 
-  /// 2. جلب وتفريغ البيانات السحابية إلى قاعدة البيانات المحلية ومزامنة البيانات المحلية الجديدة (Bidirectional Sync)
+  /// Synchronizes remote records down to local Hive storage.
   static Future<void> syncDownFromCloud() async {
     if (!SupabaseService.isReady) return;
 
     try {
+      // 1. Sync dynamic worlds and missions
+      await syncDynamicWorldsAndContent();
+
+      // 2. Sync announcements
+      final announcements = await SupabaseService.fetchAnnouncements();
+      if (announcements.isNotEmpty) {
+        await HiveService.saveCachedAnnouncements(announcements.map((a) => a.toMap()).toList());
+      }
+
+      // 3. Sync child profile and progress
       final currentProfile = ChildRepository.getChildProfile();
       final remoteData = await SupabaseService.fetchRemoteChildProfile(currentProfile.childId);
 
       if (remoteData != null) {
-        // استخراج المهام المكتملة والشارات من الجداول المرتبطة
         final remoteMissions = (remoteData['completed_missions'] as List<dynamic>?)
                 ?.map((m) => m['mission_id']?.toString() ?? '')
                 .where((id) => id.isNotEmpty)
@@ -53,7 +61,6 @@ class OfflineFirstSyncManager {
                 .toList() ??
             [];
 
-        // دمج البيانات السحابية مع المحلية مع أخذ القيمة الأعلى للنقاط والنجوم
         final mergedProfile = currentProfile.copyWith(
           childId: remoteData['child_code']?.toString() ?? currentProfile.childId,
           stars: (remoteData['stars'] as num?)?.toInt() ?? currentProfile.stars,
@@ -71,12 +78,10 @@ class OfflineFirstSyncManager {
           }.toList(),
         );
 
-        // حفظ في Hive لضمان سرعة القراءة محلياً
         await ChildRepository.saveChildProfile(mergedProfile);
-        debugPrint('✅ Synced down child data from Supabase to local Hive.');
+        debugPrint('[Sync] Updated local child profile from cloud state.');
       } else {
-        // إذا كان السجل غير موجود في Supabase بعد، نرفعه فوراً
-        debugPrint('Uploading local child profile (${currentProfile.childId}) to Supabase...');
+        debugPrint('[Sync] Uploading local profile (${currentProfile.childId}) to cloud...');
         await SupabaseService.upsertRemoteChildProfile(currentProfile);
         for (final missionId in currentProfile.completedMissions) {
           await SupabaseService.recordRemoteCompletedMission(
@@ -88,14 +93,32 @@ class OfflineFirstSyncManager {
             habitName: 'العادة',
           );
         }
-        debugPrint('✅ Uploaded existing local profile to Supabase.');
+        debugPrint('[Sync] Uploaded existing profile to cloud.');
       }
     } catch (e) {
-      debugPrint('Sync down error (will use local Hive cache): $e');
+      debugPrint('[Sync] Sync down error: $e');
     }
   }
 
-  /// 3. تسجيل تقدم الطفل محلياً وسحابياً (Local First + Cloud Sync Up)
+  /// Synchronizes remote worlds and missions into local Hive cache.
+  static Future<void> syncDynamicWorldsAndContent() async {
+    if (!SupabaseService.isReady) return;
+    try {
+      final remoteWorlds = await SupabaseService.fetchRemoteWorldsAndMissions();
+      if (remoteWorlds.isNotEmpty) {
+        await ChildRepository.saveCachedWorlds(remoteWorlds);
+        debugPrint('[Sync] Synced ${remoteWorlds.length} worlds to local cache.');
+      } else {
+        debugPrint('[Sync] No remote worlds found. Seeding initial worlds...');
+        await SupabaseService.seedInitialDataToSupabase(ChildRepository.defaultWorlds);
+        await ChildRepository.saveCachedWorlds(ChildRepository.defaultWorlds);
+      }
+    } catch (e) {
+      debugPrint('[Sync] Error syncing dynamic worlds: $e');
+    }
+  }
+
+  /// Records mission completion locally and attempts remote upload.
   static Future<void> recordMissionCompletion({
     required ChildProfileModel updatedProfile,
     required String missionId,
@@ -103,11 +126,11 @@ class OfflineFirstSyncManager {
     required int earnedPoints,
     required String habitName,
   }) async {
-    // أ. الحفظ المحلي الفوري في Hive (سرعة استجابة 0ms)
+    // 1. Instant local persistence in Hive
     await ChildRepository.saveChildProfile(updatedProfile);
     await HiveService.saveHabitStatus('h_$missionId', 'learned');
 
-    // ب. محاولة الرفع المباشر لـ Supabase إذا توفر الاتصال
+    // 2. Direct cloud upload if connected
     if (SupabaseService.isReady) {
       final success = await SupabaseService.recordRemoteCompletedMission(
         childName: updatedProfile.name,
@@ -121,12 +144,12 @@ class OfflineFirstSyncManager {
       await SupabaseService.upsertRemoteChildProfile(updatedProfile);
 
       if (success) {
-        debugPrint('✅ Mission $missionId synced directly to Supabase.');
+        debugPrint('[Sync] Mission $missionId synced to cloud.');
         return;
       }
     }
 
-    // ج. في حال عدم توفر الاتصال (Offline): إدراج المعاملة في طابور المزامنة
+    // 3. Queue for background sync if offline
     final queueKey = 'mission_${missionId}_${DateTime.now().millisecondsSinceEpoch}';
     await HiveService.addToSyncQueue(queueKey, {
       'type': 'complete_mission',
@@ -139,10 +162,10 @@ class OfflineFirstSyncManager {
       'profile': updatedProfile.toMap(),
     });
 
-    debugPrint('📦 Mission queued in local sync queue for background upload.');
+    debugPrint('[Sync] Enqueued mission $missionId for background upload.');
   }
 
-  /// 4. مزامنة المعاملات المعلقة في الخلفية عند عودة الاتصال (Sync Up Pending Queue)
+  /// Flushes pending offline transactions to the remote cloud.
   static Future<void> syncUpPendingQueue() async {
     if (_isSyncing || !SupabaseService.isReady) return;
 
@@ -154,7 +177,7 @@ class OfflineFirstSyncManager {
         return;
       }
 
-      debugPrint('🔄 Background Worker: Processing ${queue.length} pending items to Supabase...');
+      debugPrint('[Sync] Processing ${queue.length} pending offline transactions...');
 
       for (final entry in queue.entries) {
         final key = entry.key.toString();
@@ -179,19 +202,19 @@ class OfflineFirstSyncManager {
 
         if (success) {
           await HiveService.removeFromSyncQueue(key);
-          debugPrint('✅ Flushed queued item $key to Supabase.');
+          debugPrint('[Sync] Uploaded queued item $key.');
         }
       }
     } catch (e) {
-      debugPrint('Error syncing pending queue: $e');
+      debugPrint('[Sync] Error processing offline queue: $e');
     } finally {
       _isSyncing = false;
     }
   }
 
-  /// 5. تفريغ الذاكرة المؤقتة والتخزين المحلي بالكامل لاختبار المزامنة مع Supabase من الصفر
+  /// Clears local cache storage for development and testing.
   static Future<void> resetLocalCache() async {
     await HiveService.clearAll();
-    debugPrint('🧹 Local Hive storage completely wiped.');
+    debugPrint('[Sync] Local storage cleared.');
   }
 }

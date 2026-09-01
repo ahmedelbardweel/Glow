@@ -3,12 +3,9 @@ import '../../../../core/database/hive_service.dart';
 import '../../../../core/database/hive_keys.dart';
 import '../models/child_models.dart';
 
-/// مستودع بيانات تجربة الطفل في منصة GLOW (مع الشخصية الرئيسية PORT)
-/// 30 عادة أساسية مقسمة على 6 عوالم (مراحل) تفاعلية (5 عادات لكل عالم)
-/// العوالم 1 إلى 4 مجانية بالكامل، والعالمان 5 و 6 باقة التميز
+/// Interactive 3D character component.
 class ChildRepository {
-  static final List<WorldModel> worlds = [
-    // === العالم 1: غابة البدايات (مجاني) ===
+  static final List<WorldModel> _defaultWorlds = [
     WorldModel(
       worldNumber: 1,
       name: 'غابة البدايات',
@@ -275,7 +272,6 @@ class ChildRepository {
       ],
     ),
 
-    // === العالم 2: محيط المشاعر (مجاني) ===
     WorldModel(
       worldNumber: 2,
       name: 'محيط المشاعر',
@@ -528,7 +524,6 @@ class ChildRepository {
       ],
     ),
 
-    // === العالم 3: جبال التحديات (مجاني) ===
     WorldModel(
       worldNumber: 3,
       name: 'جبال التحديات',
@@ -781,7 +776,6 @@ class ChildRepository {
       ],
     ),
 
-    // === العالم 4: مملكة الحكمة (مجاني) ===
     WorldModel(
       worldNumber: 4,
       name: 'مملكة الحكمة',
@@ -1034,7 +1028,6 @@ class ChildRepository {
       ],
     ),
 
-    // === العالم 5: واحة الإبداع (مدفوع - باقة التميز) ===
     WorldModel(
       worldNumber: 5,
       name: 'واحة الإبداع',
@@ -1287,7 +1280,6 @@ class ChildRepository {
       ],
     ),
 
-    // === العالم 6: قمة الإنجاز (مدفوع - باقة التميز) ===
     WorldModel(
       worldNumber: 6,
       name: 'قمة الإنجاز',
@@ -1534,7 +1526,28 @@ class ChildRepository {
     ),
   ];
 
-  /// جلب الملف الشخصي الفعلي للطفل من Hive أو تهيئة حساب نظيف
+  static List<WorldModel> get defaultWorlds => _defaultWorlds;
+
+  static List<WorldModel> getWorlds() {
+    final cached = HiveService.getCachedWorlds();
+    if (cached != null && cached.isNotEmpty) {
+      try {
+        return cached.map((map) => WorldModel.fromMap(map)).toList();
+      } catch (_) {
+        return _defaultWorlds;
+      }
+    }
+    return _defaultWorlds;
+  }
+
+  static List<WorldModel> get worlds => getWorlds();
+
+  /// Persists state changes.
+  static Future<void> saveCachedWorlds(List<WorldModel> newWorlds) async {
+    final maps = newWorlds.map((w) => w.toMap()).toList();
+    await HiveService.saveCachedWorlds(maps);
+  }
+
   static ChildProfileModel getChildProfile() {
     final data = HiveService.getChildData<Map>(HiveKeys.childProfileKey);
     if (data != null) {
@@ -1553,17 +1566,16 @@ class ChildRepository {
       completedMissions: const [],
       earnedBadges: const [],
     );
-    // حفظ الكود الأولي محلياً لضمان بقائه ثابتاً
+    // Persists state changes.
     HiveService.saveChildData(HiveKeys.childProfileKey, initialProfile.toMap());
     return initialProfile;
   }
 
-  /// حفظ بيانات الطفل في Hive
+  /// Persists state changes.
   static Future<void> saveChildProfile(ChildProfileModel profile) async {
     await HiveService.saveChildData(HiveKeys.childProfileKey, profile.toMap());
   }
 
-  /// حساب الرتبة واللقب الرياضي/التربوي بناءً على النقاط الفعلية
   static String calculateRankTitle(int points) {
     if (points >= 3000) return 'قائد أسطوري';
     if (points >= 2000) return 'حكيم القيم';
@@ -1572,7 +1584,6 @@ class ChildRepository {
     return 'مستكشف البدايات';
   }
 
-  /// حساب النسبة المئوية للترقية للمستوى القادم
   static double calculateLevelProgress(int points) {
     if (points >= 3000) return 1.0;
     if (points >= 2000) return (points - 2000) / 1000;
@@ -1581,7 +1592,6 @@ class ChildRepository {
     return (points / 400).clamp(0.0, 1.0);
   }
 
-  /// خوارزمية فحص فتح العالم (العوالم 1-4 مجانية، و 5-6 تتطلب استحقاق الاشتراك أو التميز)
   static bool isWorldUnlocked(int worldNumber, List<String> completedMissions, {bool isSubscribed = false}) {
     if (worldNumber == 1) return true;
     final prevWorldIndex = worldNumber - 2;
@@ -1593,7 +1603,6 @@ class ChildRepository {
     final completedPrevious = prevWorldMissionIds.every((id) => completedMissions.contains(id));
     if (!completedPrevious) return false;
 
-    // العوالم 5 و 6 تتطلب الاشتراك في باقة التميز
     if (worldNumber >= 5 && !isSubscribed) {
       return false;
     }

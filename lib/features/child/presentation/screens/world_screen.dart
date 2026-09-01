@@ -10,7 +10,7 @@ import '../bloc/child_bloc.dart';
 import '../widgets/world_scenery_painter.dart';
 import 'mission_selection_screen.dart';
 
-/// شاشة استعراض بيئة العالم ومهماته الخمس التفاعلية للأطفال بدون أي إيموجي
+/// World details and mission list screen.
 class WorldScreen extends StatelessWidget {
   final WorldModel world;
 
@@ -32,7 +32,6 @@ class WorldScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           body: Column(
             children: [
-              // لافتة بيئة العالم المصورة
               AppCard(
                 padding: EdgeInsets.zero,
                 backgroundColor:
@@ -114,7 +113,6 @@ class WorldScreen extends StatelessWidget {
                 ),
               ),
 
-              // قائمة المهمات الخمس التفاعلية
               Expanded(
                 child: ListView.separated(
                   physics: const BouncingScrollPhysics(),
@@ -151,7 +149,6 @@ class WorldScreen extends StatelessWidget {
                           : null,
                       child: Row(
                         children: [
-                          // رقم المهمة
                           Container(
                             width: 44,
                             height: 44,
@@ -185,7 +182,6 @@ class WorldScreen extends StatelessWidget {
                           ),
                           const SizedBox(width: 14),
 
-                          // اسم المهمة وتفاصيل العادة
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,7 +231,7 @@ class WorldScreen extends StatelessWidget {
                             ),
                           ),
 
-                          // زر البدء أو علامة الإنجاز
+                          // Action button.
                           if (isCompleted)
                             Container(
                               padding: const EdgeInsets.symmetric(

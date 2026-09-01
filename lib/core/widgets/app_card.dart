@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 
-/// بطاقة موحدة لكافة شاشات التطبيق
-/// تعتمد بالكامل على AppRadius لتغيير حواف كافة البطاقات مركزياً
+/// Information card.
 class AppCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;

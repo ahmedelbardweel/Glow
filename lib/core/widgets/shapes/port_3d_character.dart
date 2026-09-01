@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 
-/// أوضاع وتعبيرات الشخصية ثلاثية الأبعاد (3D Character Poses)
+/// Interactive 3D character component.
 enum CharacterPose {
   neutral,
   happy,
@@ -12,8 +12,8 @@ enum CharacterPose {
   encouraging,
 }
 
-/// عنصر عرض الشخصيات ثلاثية الأبعاد التفاعلية (Interactive 3D Character)
-/// يدعم الحركة الحية (Breathing & Floating Animation) واللمس التفاعلي ثلاثي الأبعاد (3D Touch Tilt)
+/// Interactive 3D character component.
+/// Interactive 3D character component.
 class Port3DCharacter extends StatefulWidget {
   final String characterName; // PORT, MORT, FORT, QORT, LORT
   final double size;
@@ -129,11 +129,11 @@ class _Port3DCharacterState extends State<Port3DCharacter>
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // مجسم الشخصية مع تحويل المنظور ثلاثي الأبعاد
+              // Interactive 3D character component.
               Transform(
                 alignment: Alignment.center,
                 transform: Matrix4.identity()
-                  ..setEntry(3, 2, 0.001) // عمق المنظور 3D
+                  ..setEntry(3, 2, 0.001) // Interactive 3D character component.
                   ..rotateX(_tiltX)
                   ..rotateY(_tiltY)
                   ..setTranslationRaw(0.0, -floatOffset, 0.0),
@@ -187,7 +187,7 @@ class _Port3DCharacterState extends State<Port3DCharacter>
 
               const SizedBox(height: 6),
 
-              // ظل ثلاثي الأبعاد أسفل الشخصية يتنفس مع الحركة
+              // Interactive 3D character component.
               Transform.scale(
                 scaleX: shadowScale,
                 scaleY: shadowScale * 0.5,

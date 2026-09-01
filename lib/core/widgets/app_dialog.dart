@@ -4,7 +4,6 @@ import '../theme/app_radius.dart';
 import '../theme/app_typography.dart';
 import 'app_button.dart';
 
-/// نافذة حوار منبثقة موحدة تعتمد على AppRadius وبدون أيقونات أو إيموجي
 class AppDialog extends StatelessWidget {
   final String title;
   final String message;
@@ -67,7 +66,6 @@ class AppDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // شريط جمالي في أعلى النافذة بلون مخصص
             Container(
               height: 6,
               width: 48,

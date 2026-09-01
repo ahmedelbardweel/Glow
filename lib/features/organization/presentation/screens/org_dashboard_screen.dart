@@ -11,8 +11,6 @@ import 'class_details_screen.dart';
 import 'org_reports_screen.dart';
 import 'students_management_screen.dart';
 
-/// 2. لوحة تحكم المنظمة (Organization Dashboard)
-/// واجهة إدارية شاملة تعرض المؤشرات الحيوية وشريط لأحدث النشاطات
 class OrgDashboardScreen extends StatelessWidget {
   const OrgDashboardScreen({super.key});
 
@@ -34,7 +32,7 @@ class OrgDashboardScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: 8),
 
-                // بطاقة الإحصائيات الأربع الرئيسية
+                // Information card.
                 Row(
                   children: [
                     Expanded(
@@ -104,7 +102,6 @@ class OrgDashboardScreen extends StatelessWidget {
 
                 const SizedBox(height: 14),
 
-                // معدل الإنجاز العام الفعلي المحسوب من متوسط الطلاب
                 Builder(
                   builder: (context) {
                     final students = state.allStudents;
@@ -126,7 +123,6 @@ class OrgDashboardScreen extends StatelessWidget {
 
                 const SizedBox(height: 18),
 
-                // أقسام الإدارة
                 Text(
                   'أقسام المنظمة وإدارة الطلاب',
                   style: AppTypography.titleSmall.copyWith(
@@ -135,7 +131,6 @@ class OrgDashboardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
 
-                // 1. إدارة الطلاب
                 AppCard(
                   padding: const EdgeInsets.all(14),
                   onTap: () {
@@ -170,7 +165,6 @@ class OrgDashboardScreen extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
-                // 2. تفاصيل الفصول
                 AppCard(
                   padding: const EdgeInsets.all(14),
                   onTap: () {
@@ -205,7 +199,6 @@ class OrgDashboardScreen extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
-                // 3. التقارير والتحليلات
                 AppCard(
                   padding: const EdgeInsets.all(14),
                   onTap: () {

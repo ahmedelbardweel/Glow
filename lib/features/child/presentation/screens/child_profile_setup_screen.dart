@@ -9,8 +9,6 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../bloc/child_bloc.dart';
 import 'character_selection_screen.dart';
 
-/// 3. إنشاء حساب الطفل (Child Profile Setup)
-/// إدخال الحد الأدنى من البيانات لعدم تشتيت الطفل: الاسم والعمر فقط
 class ChildProfileSetupScreen extends StatefulWidget {
   const ChildProfileSetupScreen({super.key});
 
@@ -61,7 +59,7 @@ class _ChildProfileSetupScreenState extends State<ChildProfileSetupScreen> {
           children: [
             const SizedBox(height: 8),
 
-            // حقل الاسم
+            // Input field.
             AppTextField(
               label: 'اسم البطل الصغير',
               hint: 'اكتب اسمك هنا (مثلاً: ريان، لانا)',
@@ -70,7 +68,6 @@ class _ChildProfileSetupScreenState extends State<ChildProfileSetupScreen> {
 
             const SizedBox(height: 24),
 
-            // اختيار العمر
             Text(
               'كم عمرك يا بطل؟',
               style: AppTypography.titleSmall.copyWith(
@@ -129,7 +126,7 @@ class _ChildProfileSetupScreenState extends State<ChildProfileSetupScreen> {
 
             const SizedBox(height: 40),
 
-            // زر المتابعة
+            // Action button.
             AppButton(
               text: 'التالي: اختيار الشخصية',
               variant: AppButtonVariant.primary,

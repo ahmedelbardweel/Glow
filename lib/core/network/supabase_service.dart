@@ -3,16 +3,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_config.dart';
 import '../../features/child/data/models/child_models.dart';
 
-/// خدمة الاتصال والعمليات السحابية المباشرة مع Supabase
+/// Supabase cloud data and synchronization service.
 class SupabaseService {
   SupabaseService._();
 
   static bool _isInitialized = false;
 
-  /// تهيئة اتصال Supabase
+  /// Initializes the Supabase client connection.
   static Future<void> init() async {
     if (!SupabaseConfig.isConfigured) {
-      debugPrint('⚠️ Supabase credentials not set yet. Running in offline/local Hive fallback mode.');
+      debugPrint('[Supabase] Credentials not configured. Operating in local offline mode.');
       return;
     }
 
@@ -23,18 +23,302 @@ class SupabaseService {
         anonKey: SupabaseConfig.supabaseAnonKey,
       );
       _isInitialized = true;
-      debugPrint('✅ Supabase initialized successfully.');
+      debugPrint('[Supabase] Initialized successfully.');
     } catch (e) {
-      debugPrint('❌ Error initializing Supabase: $e');
+      debugPrint('[Supabase] Initialization error: $e');
     }
   }
 
   static SupabaseClient? get client => _isInitialized ? Supabase.instance.client : null;
   static bool get isReady => _isInitialized && client != null;
 
-  // === 1. عمليات ملف الطفل والتقدم (Children & Progress) ===
+  // ==============================================================================
+  // 1. Dynamic Worlds & Missions Management (Admin)
+  // ==============================================================================
 
-  /// تسجيل أو تحديث بيانات ولي الأمر في جدول parents
+  /// Fetches all dynamic worlds and nested missions from Supabase.
+  static Future<List<WorldModel>> fetchRemoteWorldsAndMissions() async {
+    if (!isReady) return [];
+    try {
+      final worldsResponse = await client!
+          .from('app_worlds')
+          .select('*, app_missions(*)')
+          .order('sort_order', ascending: true);
+
+      final List<WorldModel> worlds = [];
+      for (final rawWorld in worldsResponse) {
+        final rawMissions = (rawWorld['app_missions'] as List<dynamic>?) ?? [];
+        rawMissions.sort((a, b) => ((a['number'] as num?) ?? 0).compareTo((b['number'] as num?) ?? 0));
+
+        final worldMap = Map<String, dynamic>.from(rawWorld);
+        worldMap['missions'] = rawMissions;
+        worlds.add(WorldModel.fromMap(worldMap));
+      }
+
+      debugPrint('[Supabase] Fetched ${worlds.length} worlds from cloud.');
+      return worlds;
+    } catch (e) {
+      debugPrint('[Supabase] Error fetching worlds and missions: $e');
+      return [];
+    }
+  }
+
+  /// Inserts or updates a world record in Supabase.
+  static Future<bool> upsertRemoteWorld(WorldModel world) async {
+    if (!isReady) return true;
+    try {
+      // ignore: deprecated_member_use
+      final colorHex = '#${world.worldColor.value.toRadixString(16).padLeft(8, '0')}';
+      await client!.from('app_worlds').upsert({
+        'world_number': world.worldNumber,
+        'name': world.name,
+        'description': world.description,
+        'world_color_hex': colorHex,
+        'is_premium': world.isPremium,
+        'sort_order': world.worldNumber,
+        'updated_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'world_number');
+
+      for (final mission in world.missions) {
+        await upsertRemoteMission(world.worldNumber, mission);
+      }
+
+      debugPrint('[Supabase] Upserted world #${world.worldNumber} (${world.name}).');
+      return true;
+    } catch (e) {
+      debugPrint('[Supabase] Error upserting world: $e');
+      return false;
+    }
+  }
+
+  /// Deletes a world record and its cascade relations from Supabase.
+  static Future<bool> deleteRemoteWorld(int worldNumber) async {
+    if (!isReady) return true;
+    try {
+      await client!.from('app_worlds').delete().eq('world_number', worldNumber);
+      debugPrint('[Supabase] Deleted world #$worldNumber.');
+      return true;
+    } catch (e) {
+      debugPrint('[Supabase] Error deleting world: $e');
+      return false;
+    }
+  }
+
+  /// Inserts or updates a mission record in Supabase.
+  static Future<bool> upsertRemoteMission(int worldNumber, MissionModel mission) async {
+    if (!isReady) return true;
+    try {
+      await client!.from('app_missions').upsert({
+        'id': mission.id,
+        'world_number': worldNumber,
+        'number': mission.number,
+        'title': mission.title,
+        'habit_name': mission.habitName,
+        'habit_description': mission.habitDescription,
+        'reward_stars': mission.rewardStars,
+        'reward_points': mission.rewardPoints,
+        'story_scenes': mission.storyScenes.map((s) => s.toMap()).toList(),
+        'quiz': mission.quiz.toMap(),
+        'updated_at': DateTime.now().toIso8601String(),
+      }, onConflict: 'id');
+
+      debugPrint('[Supabase] Upserted mission ${mission.id} (${mission.title}).');
+      return true;
+    } catch (e) {
+      debugPrint('[Supabase] Error upserting mission: $e');
+      return false;
+    }
+  }
+
+  /// Deletes a mission record from Supabase.
+  static Future<bool> deleteRemoteMission(String missionId) async {
+    if (!isReady) return true;
+    try {
+      await client!.from('app_missions').delete().eq('id', missionId);
+      debugPrint('[Supabase] Deleted mission $missionId.');
+      return true;
+    } catch (e) {
+      debugPrint('[Supabase] Error deleting mission: $e');
+      return false;
+    }
+  }
+
+  /// Seeds initial default worlds and missions into Supabase.
+  static Future<bool> seedInitialDataToSupabase(List<WorldModel> initialWorlds) async {
+    if (!isReady) return false;
+    try {
+      for (final world in initialWorlds) {
+        await upsertRemoteWorld(world);
+      }
+      debugPrint('[Supabase] Successfully seeded ${initialWorlds.length} initial worlds.');
+      return true;
+    } catch (e) {
+      debugPrint('[Supabase] Error seeding initial data: $e');
+      return false;
+    }
+  }
+
+  // ==============================================================================
+  // 2. Admin Overview Stats & User Management
+  // ==============================================================================
+
+  /// Fetches global overview KPIs for the admin portal.
+  static Future<AdminStatsModel> fetchAdminOverviewStats() async {
+    if (!isReady) {
+      return const AdminStatsModel(isSupabaseConnected: false);
+    }
+    try {
+      final childrenRes = await client!.from('children').select('stars, points');
+      final parentsRes = await client!.from('parents').select('id');
+      final orgsRes = await client!.from('organizations').select('id');
+      final missionsRes = await client!.from('completed_missions').select('id');
+      final worldsRes = await client!.from('app_worlds').select('world_number');
+      final customMissionsRes = await client!.from('app_missions').select('id');
+
+      int totalStars = 0;
+      int totalPoints = 0;
+      for (final row in childrenRes) {
+        totalStars += ((row['stars'] as num?) ?? 0).toInt();
+        totalPoints += ((row['points'] as num?) ?? 0).toInt();
+      }
+
+      return AdminStatsModel(
+        totalChildren: (childrenRes as List).length,
+        totalParents: (parentsRes as List).length,
+        totalOrganizations: (orgsRes as List).length,
+        totalCompletedMissions: (missionsRes as List).length,
+        totalStarsGiven: totalStars,
+        totalPointsGiven: totalPoints,
+        totalCustomWorlds: (worldsRes as List).length,
+        totalCustomMissions: (customMissionsRes as List).length,
+        isSupabaseConnected: true,
+      );
+    } catch (e) {
+      debugPrint('[Supabase] Error fetching admin stats: $e');
+      return const AdminStatsModel(isSupabaseConnected: false);
+    }
+  }
+
+  /// Fetches all registered children profiles from Supabase.
+  static Future<List<ChildProfileModel>> fetchAllChildrenProfiles() async {
+    if (!isReady) return [];
+    try {
+      final response = await client!
+          .from('children')
+          .select('*, completed_missions(*), earned_badges(*)')
+          .order('points', ascending: false);
+
+      final List<ChildProfileModel> children = [];
+      for (final item in response) {
+        final rawMissions = (item['completed_missions'] as List<dynamic>?)
+                ?.map((m) => m['mission_id']?.toString() ?? '')
+                .where((id) => id.isNotEmpty)
+                .toList() ??
+            [];
+
+        final rawBadges = (item['earned_badges'] as List<dynamic>?)
+                ?.map((b) => b['badge_name']?.toString() ?? '')
+                .where((b) => b.isNotEmpty)
+                .toList() ??
+            [];
+
+        final map = Map<String, dynamic>.from(item);
+        map['completedMissions'] = rawMissions;
+        map['earnedBadges'] = rawBadges;
+        children.add(ChildProfileModel.fromMap(map));
+      }
+      return children;
+    } catch (e) {
+      debugPrint('[Supabase] Error fetching children: $e');
+      return [];
+    }
+  }
+
+  /// Updates child points, stars, or current world from the admin console.
+  static Future<bool> updateChildStatsByAdmin({
+    required String childCode,
+    int? stars,
+    int? points,
+    int? currentWorld,
+  }) async {
+    if (!isReady) return false;
+    try {
+      final updateData = <String, dynamic>{
+        'updated_at': DateTime.now().toIso8601String(),
+      };
+      if (stars != null) updateData['stars'] = stars;
+      if (points != null) updateData['points'] = points;
+      if (currentWorld != null) updateData['current_world'] = currentWorld;
+
+      await client!.from('children').update(updateData).eq('child_code', childCode.toUpperCase());
+      debugPrint('[Supabase] Admin updated stats for child $childCode');
+      return true;
+    } catch (e) {
+      debugPrint('[Supabase] Error updating child stats: $e');
+      return false;
+    }
+  }
+
+  // ==============================================================================
+  // 3. Announcements
+  // ==============================================================================
+
+  /// Fetches all active announcements.
+  static Future<List<AnnouncementModel>> fetchAnnouncements() async {
+    if (!isReady) return [];
+    try {
+      final response = await client!
+          .from('app_announcements')
+          .select('*')
+          .eq('is_active', true)
+          .order('created_at', ascending: false);
+
+      return (response as List<dynamic>)
+          .map((item) => AnnouncementModel.fromMap(Map<String, dynamic>.from(item as Map)))
+          .toList();
+    } catch (e) {
+      debugPrint('[Supabase] Error fetching announcements: $e');
+      return [];
+    }
+  }
+
+  /// Publishes a new announcement.
+  static Future<bool> createAnnouncement(AnnouncementModel announcement) async {
+    if (!isReady) return true;
+    try {
+      await client!.from('app_announcements').insert({
+        'title': announcement.title,
+        'content': announcement.content,
+        'target_role': announcement.targetRole,
+        'is_active': announcement.isActive,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+      debugPrint('[Supabase] Created announcement: ${announcement.title}');
+      return true;
+    } catch (e) {
+      debugPrint('[Supabase] Error creating announcement: $e');
+      return false;
+    }
+  }
+
+  /// Deletes an announcement by its ID.
+  static Future<bool> deleteAnnouncement(String id) async {
+    if (!isReady) return true;
+    try {
+      await client!.from('app_announcements').delete().eq('id', id);
+      debugPrint('[Supabase] Deleted announcement: $id');
+      return true;
+    } catch (e) {
+      debugPrint('[Supabase] Error deleting announcement: $e');
+      return false;
+    }
+  }
+
+  // ==============================================================================
+  // 4. Child, Parent, and Organization Sync Operations
+  // ==============================================================================
+
+  /// Inserts or updates parent record in the parents table.
   static Future<bool> upsertParent(String email) async {
     if (!isReady) return true;
     try {
@@ -44,26 +328,24 @@ class SupabaseService {
         'email': cleanEmail,
         'updated_at': DateTime.now().toIso8601String(),
       }, onConflict: 'email');
-      debugPrint('✅ Upserted parent ($cleanEmail) in Supabase.');
+      debugPrint('[Supabase] Upserted parent: $cleanEmail');
       return true;
     } catch (e) {
-      debugPrint('Error upserting parent in Supabase: $e');
+      debugPrint('[Supabase] Error upserting parent: $e');
       return false;
     }
   }
 
-  /// جلب بيانات الطفل من السحابة بالكود الفريد (Child ID) أو بالاسم
+  /// Fetches child profile data by child ID code or name.
   static Future<Map<String, dynamic>?> fetchRemoteChildProfile(String childCodeOrName) async {
     if (!isReady) return null;
     try {
-      // 1. محاولة البحث بالكود الفريد child_code
       var response = await client!
           .from('children')
           .select('*, completed_missions(*), earned_badges(*)')
           .eq('child_code', childCodeOrName.trim().toUpperCase())
           .maybeSingle();
 
-      // 2. إذا لم يوجد بالكود، نبحث بالاسم كـ Fallback
       response ??= await client!
           .from('children')
           .select('*, completed_missions(*), earned_badges(*)')
@@ -72,19 +354,18 @@ class SupabaseService {
 
       return response;
     } catch (e) {
-      debugPrint('Error fetching child profile from Supabase: $e');
+      debugPrint('[Supabase] Error fetching child profile: $e');
       return null;
     }
   }
 
-  /// رفع وتحديث ملف الطفل في السحابة (Sync Up)
+  /// Upserts child profile state to Supabase cloud.
   static Future<bool> upsertRemoteChildProfile(ChildProfileModel profile) async {
-    if (!isReady) return true; // وضع عدم الاتصال / Fallback
+    if (!isReady) return true;
     try {
       final code = profile.childId.toUpperCase();
       final parentEmail = profile.parentEmail?.trim().toLowerCase();
 
-      // إذا كان هناك بريد لولي الأمر، نضمن وجوده في جدول parents أولاً
       if (parentEmail != null && parentEmail.isNotEmpty) {
         await upsertParent(parentEmail);
       }
@@ -101,15 +382,15 @@ class SupabaseService {
         'parent_id': (parentEmail != null && parentEmail.isNotEmpty) ? parentEmail : null,
         'updated_at': DateTime.now().toIso8601String(),
       }, onConflict: 'child_code');
-      debugPrint('✅ Upserted child ($code) in Supabase.');
+      debugPrint('[Supabase] Upserted child profile ($code).');
       return true;
     } catch (e) {
-      debugPrint('Error upserting child profile in Supabase: $e');
+      debugPrint('[Supabase] Error upserting child profile: $e');
       return false;
     }
   }
 
-  /// ربط الطفل بحساب ولي الأمر في السحابة
+  /// Links a child account to a parent email.
   static Future<Map<String, dynamic>?> linkChildToParent({
     required String childCode,
     required String parentEmail,
@@ -120,10 +401,8 @@ class SupabaseService {
       final cleanEmail = parentEmail.trim().toLowerCase();
       final code = childCode.trim().toUpperCase();
 
-      // 1. تسجيل ولي الأمر في جدول parents
       await upsertParent(cleanEmail);
       
-      // 2. فحص ما إذا كان الطفل موجوداً في جدول children
       var child = await client!
           .from('children')
           .select('*, completed_missions(*), earned_badges(*)')
@@ -131,13 +410,11 @@ class SupabaseService {
           .maybeSingle();
 
       if (child != null) {
-        // تحديث بريد ولي الأمر المرتبط
         await client!.from('children').update({
           'parent_id': cleanEmail,
           'updated_at': DateTime.now().toIso8601String(),
         }).eq('child_code', code);
       } else {
-        // إنشاء سجل الطفل فوراً وربطه بولي الأمر
         final newChildData = {
           'child_code': code,
           'parent_id': cleanEmail,
@@ -154,15 +431,15 @@ class SupabaseService {
         child = newChildData;
       }
 
-      debugPrint('✅ Successfully linked child ($code) to parent ($cleanEmail) in Supabase.');
+      debugPrint('[Supabase] Linked child ($code) to parent ($cleanEmail).');
       return child;
     } catch (e) {
-      debugPrint('Error linking child to parent in Supabase: $e');
+      debugPrint('[Supabase] Error linking child to parent: $e');
       return null;
     }
   }
 
-  /// جلب كافة الأطفال المرتبطين بولي الأمر
+  /// Fetches all children linked to a parent email.
   static Future<List<Map<String, dynamic>>> fetchParentChildren(String parentEmail) async {
     if (!isReady) return [];
     try {
@@ -172,12 +449,12 @@ class SupabaseService {
           .eq('parent_id', parentEmail);
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      debugPrint('Error fetching parent children: $e');
+      debugPrint('[Supabase] Error fetching parent children: $e');
       return [];
     }
   }
 
-  /// تسجيل مهمة مكتملة في السحابة بالكود الفريد
+  /// Records a completed mission event in the cloud database.
   static Future<bool> recordRemoteCompletedMission({
     required String childName,
     String? childCode,
@@ -198,7 +475,6 @@ class SupabaseService {
         'completed_at': DateTime.now().toIso8601String(),
       }, onConflict: 'child_code, mission_id');
 
-      // تسجيل الشارة تلقائياً
       await client!.from('earned_badges').upsert({
         'child_code': code,
         'badge_name': 'وسام $habitName',
@@ -207,14 +483,12 @@ class SupabaseService {
 
       return true;
     } catch (e) {
-      debugPrint('Error recording completed mission in Supabase: $e');
+      debugPrint('[Supabase] Error recording completed mission: $e');
       return false;
     }
   }
 
-  // === 2. عادات ولي الأمر (Parent & Habits) ===
-
-  /// مزامنة حالة العادة في السحابة
+  /// Updates habit completion progress in the cloud database.
   static Future<bool> upsertHabitStatus({
     required String childName,
     String? childCode,
@@ -232,21 +506,19 @@ class SupabaseService {
       }, onConflict: 'child_code, habit_id');
       return true;
     } catch (e) {
-      debugPrint('Error updating habit status in Supabase: $e');
+      debugPrint('[Supabase] Error updating habit status: $e');
       return false;
     }
   }
 
-  // === 3. المنظمة التعليمية (Organization Data) ===
-
-  /// مزامنة بيانات المؤسسة والطلاب
+  /// Updates organization and classroom metadata in the cloud database.
   static Future<bool> upsertOrganizationData(Map<String, dynamic> orgData) async {
     if (!isReady) return true;
     try {
       await client!.from('organizations').upsert(orgData, onConflict: 'org_name');
       return true;
     } catch (e) {
-      debugPrint('Error updating organization data in Supabase: $e');
+      debugPrint('[Supabase] Error updating organization data: $e');
       return false;
     }
   }

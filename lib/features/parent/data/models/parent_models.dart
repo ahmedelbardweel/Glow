@@ -1,16 +1,15 @@
-/// حالة العادة
 enum HabitStatus {
-  learned,    // تم تعلمها
-  inProgress, // قيد التعلم
-  locked,     // مقفلة
+  learned,
+  inProgress,
+  locked,
 }
 
-/// نموذج العادة (من الـ 30 عادة الأساسية)
+/// Domain data model.
 class HabitModel {
   final int number;
   final String id;
   final String title;
-  final String category; // شخصية، اجتماعية، قيادية، بدنية، عقلية
+  final String category; // Interactive 3D character component.
   final HabitStatus status;
   final String strengthReport;
   final String parentSupportSuggestion;
@@ -40,7 +39,7 @@ class HabitModel {
   }
 }
 
-/// نموذج النشاط المنزلي لدعم الطفل في الواقع
+/// Domain data model.
 class HomeActivityModel {
   final String id;
   final String title;
@@ -59,11 +58,9 @@ class HomeActivityModel {
   });
 }
 
-/// قائمة الـ 30 عادة الأساسية المعتمدة في منصة GLOW موزعة على العوالم الستة
 class ParentRepositoryData {
   static List<HabitModel> generate30Habits() {
     return [
-      // === العالم 1: غابة البدايات ===
       const HabitModel(
         number: 1,
         id: 'h1',
@@ -110,7 +107,6 @@ class ParentRepositoryData {
         parentSupportSuggestion: 'خصص 15 دقيقة لقراءة قصة دافئة قبل النوم مع إطفاء الأجهزة الإلكترونية.',
       ),
 
-      // === العالم 2: محيط المشاعر ===
       const HabitModel(
         number: 6,
         id: 'h6',
@@ -157,7 +153,6 @@ class ParentRepositoryData {
         parentSupportSuggestion: 'كن قدوة في الاعتذار أمامه عندما تخطئ ليرى أن الاعتذار شجاعة.',
       ),
 
-      // === العالم 3: جبال التحديات ===
       const HabitModel(
         number: 11,
         id: 'h11',
@@ -204,7 +199,6 @@ class ParentRepositoryData {
         parentSupportSuggestion: 'أوكل إليه مهاماً منزلية واضحة ومحددة تناسب عمره.',
       ),
 
-      // === العالم 4: مملكة الحكمة ===
       const HabitModel(
         number: 16,
         id: 'h16',
@@ -251,7 +245,6 @@ class ParentRepositoryData {
         parentSupportSuggestion: 'ناقش معه المواقف الصعبة وركز على الدروس الإيجابية المستفادة.',
       ),
 
-      // === العالم 5: واحة الإبداع ===
       const HabitModel(
         number: 21,
         id: 'h21',
@@ -298,7 +291,6 @@ class ParentRepositoryData {
         parentSupportSuggestion: 'اطرح عليه ألغازاً وتحديات تفكير خيالي واطلب منه حلولاً متعددة.',
       ),
 
-      // === العالم 6: قمة الإنجاز ===
       const HabitModel(
         number: 26,
         id: 'h26',

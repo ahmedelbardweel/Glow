@@ -10,8 +10,7 @@ import '../../../../core/widgets/shapes/port_shape_avatar.dart';
 import '../../data/models/child_models.dart';
 import '../bloc/quiz_bloc.dart';
 
-/// 12. شاشة الإجابة الخاطئة (Wrong Answer - Supportive Learning)
-/// تجنب الإحباط بكلمات سلبية؛ حيث يقال "محاولة جميلة" مع شرح مبسط للسبب وفرصة للتعلم
+/// Application feature screen.
 class WrongAnswerScreen extends StatelessWidget {
   final MissionModel mission;
   final QuizOptionModel? selectedOption;
@@ -37,17 +36,17 @@ class WrongAnswerScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // شخصية PORT الموجهة بلطف
+              // Interactive 3D character component.
               const Center(
                 child: PortShapeAvatar(
-                  characterName: 'FORT', // FORT الحكيم الصبور
+                  characterName: 'FORT',
                   size: 100,
                   showBadge: true,
                 ),
               ),
               const SizedBox(height: 20),
 
-              // بطاقة التوجيه اللطيف والشرح
+              // Information card.
               AppCard(
                 backgroundColor: isDark ? AppColors.darkSurface : AppColors.gentleSupportLight,
                 borderWidth: 1,
@@ -110,7 +109,7 @@ class WrongAnswerScreen extends StatelessWidget {
 
               const SizedBox(height: 28),
 
-              // زر إعادة المحاولة
+              // Action button.
               AppButton(
                 text: 'أريد المحاولة مرة أخرى الآن',
                 variant: AppButtonVariant.primary,

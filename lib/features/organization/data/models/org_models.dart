@@ -1,7 +1,7 @@
-/// نموذج المنظمة التعليمية (B2B)
+/// Domain data model.
 class OrgModel {
   final String name;
-  final String type; // مدرسة، روضة أطفال، مركز تعليمي
+  final String type;
   final int totalStudents;
   final int totalTeachers;
   final int totalClasses;
@@ -65,7 +65,7 @@ class OrgModel {
   }
 }
 
-/// نموذج الطالب في المنظمة
+/// Domain data model.
 class OrgStudentModel {
   final String id;
   final String name;
@@ -110,7 +110,7 @@ class OrgStudentModel {
   }
 }
 
-/// نموذج الفصل الدراسي
+/// Domain data model.
 class OrgClassModel {
   final String id;
   final String name;
@@ -129,7 +129,6 @@ class OrgClassModel {
   });
 }
 
-/// بيانات أولية لمنظمة B2B
 class OrgRepositoryData {
   static List<OrgStudentModel> getSampleStudents() {
     return const [

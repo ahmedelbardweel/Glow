@@ -6,8 +6,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 import '../theme/theme_cubit.dart';
 
-/// هيكل الشاشة الموحد لكافة شاشات التطبيق (Unified App Scaffold & Top AppBar)
-/// يدمج شريط الحالة (Status Bar) مع شريط العنوان الموحد بدون أي تباعد زائد أو تكرار للحواف
+/// Application feature screen.
 class AppScaffold extends StatelessWidget {
   final String? title;
   final String? subtitle;
@@ -60,7 +59,6 @@ class AppScaffold extends StatelessWidget {
         backgroundColor: backgroundColor ?? (isDark ? AppColors.darkBackground : AppColors.warmCream),
         body: Column(
           children: [
-            // 1. ترويسة مخصصة بالكامل (Custom Header)
             if (customHeader != null)
               Container(
                 width: double.infinity,
@@ -88,7 +86,6 @@ class AppScaffold extends StatelessWidget {
                 ),
                 child: customHeader,
               )
-            // 2. شريط العنوان القياسي الموحد (Standard Header)
             else if (hasStandardHeader)
               Container(
                 width: double.infinity,
@@ -116,7 +113,7 @@ class AppScaffold extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    // زر الرجوع الموحد
+                    // Action button.
                     if (showBackButton && canPop)
                       InkWell(
                         onTap: onBack ?? () => Navigator.of(context).maybePop(),
@@ -148,7 +145,7 @@ class AppScaffold extends StatelessWidget {
 
                     const SizedBox(width: 12),
 
-                    // عنوان ووصف الشاشة
+                    // Application feature screen.
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,7 +181,7 @@ class AppScaffold extends StatelessWidget {
 
                     if (actions != null) ...actions!,
 
-                    // زر تبديل الثيم الموحد (نهاري / ليلي)
+                    // Action button.
                     if (showThemeToggle) ...[
                       const SizedBox(width: 8),
                       InkWell(
@@ -219,7 +216,7 @@ class AppScaffold extends StatelessWidget {
             else
               SizedBox(height: topPadding),
 
-            // محتوى الشاشة الأساسي
+            // Application feature screen.
             Expanded(
               child: SafeArea(
                 top: false,

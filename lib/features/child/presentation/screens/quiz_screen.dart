@@ -10,8 +10,7 @@ import '../bloc/quiz_bloc.dart';
 import 'correct_answer_screen.dart';
 import 'wrong_answer_screen.dart';
 
-/// 10. شاشة السؤال (Quiz Screen)
-/// عرض الموقف مع 4 خيارات مصممة هندسياً (A, B, C, D)
+/// Interactive scenario challenge screen.
 class QuizScreen extends StatefulWidget {
   final MissionModel mission;
 
@@ -64,7 +63,7 @@ class _QuizScreenState extends State<QuizScreen> {
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // بطاقة الموقف والسؤال
+              // Information card.
               AppCard(
                 backgroundColor: isDark ? AppColors.darkSurface : AppColors.pureWhite,
                 borderColor: isDark ? AppColors.darkBorder : AppColors.lightBorder,
@@ -110,7 +109,6 @@ class _QuizScreenState extends State<QuizScreen> {
 
               const SizedBox(height: 14),
 
-              // الخيارات الأربعة التفاعلية المتغيرة (A, B, C, D)
               Expanded(
                 child: Builder(
                   builder: (context) {

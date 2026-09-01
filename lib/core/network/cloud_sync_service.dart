@@ -3,17 +3,16 @@ import '../database/hive_keys.dart';
 import '../database/hive_service.dart';
 import '../../features/child/data/models/child_models.dart';
 
-/// حالة المزامنة السحابية
+/// Connection and synchronization status indicator.
 enum CloudSyncStatus {
-  synced,     // تمت المزامنة بنجاح
-  syncing,    // جاري المزامنة مع السيرفر
-  offline,    // غير متصل (حفظ محلي آمن في Hive)
-  error,      // حدث خطأ في الاتصال
+  synced,
+  syncing,
+  offline,
+  error,
 }
 
-/// خدمة المزامنة السحابية وإدارة الاتصال بالإنترنت لمنصة GLOW
-/// توفر مزامنة سحابية متقدمة لبيانات الطفل، لوحة تحكم ولي الأمر، والمنظمات
-/// مع نظام حماية وحفظ محلي فائق يضمن استمرار تجربة الطفل والقصة حتى في حال انقطاع الشبكة
+/// Cloud sync management service for the GLOW platform.
+/// Handles online status and local queue management.
 class CloudSyncService {
   CloudSyncService._();
 
@@ -25,7 +24,7 @@ class CloudSyncService {
   static bool _isOnline = true;
   static bool get isOnline => _isOnline;
 
-  /// تهيئة خدمة المزامنة وفحص الطابور غير المتزامن
+  /// Initializes synchronization state and processes pending queue items.
   static Future<void> init() async {
     _isOnline = HiveService.getSetting<bool>(HiveKeys.isOnlineModeKey, defaultValue: true);
     if (_isOnline) {
@@ -33,7 +32,7 @@ class CloudSyncService {
     }
   }
 
-  /// تبديل محاكاة حالة الاتصال (Online / Offline) لأغراض الاختبار والعرض
+  /// Toggles online simulation mode for offline testing.
   static Future<void> setOnlineMode(bool online) async {
     _isOnline = online;
     await HiveService.saveSetting(HiveKeys.isOnlineModeKey, online);
@@ -44,18 +43,16 @@ class CloudSyncService {
     }
   }
 
-  /// مزامنة ملف الطفل وإنجازاته مع السحابة
+  /// Syncs child progress state to cloud storage.
   static Future<bool> syncChildProgressToCloud({
     required ChildProfileModel profile,
     String? completedMissionId,
     int addedStars = 0,
     int addedPoints = 0,
   }) async {
-    // 1. الحفظ المحلي الفوري دائماً لضمان عدم ضياع أي تقدم
     await HiveService.saveChildData(HiveKeys.childProfileKey, profile.toMap());
 
     if (!_isOnline) {
-      // حفظ في طابور المزامنة في حال عدم توفر اتصال
       await HiveService.addToSyncQueue('child_sync_${DateTime.now().millisecondsSinceEpoch}', {
         'type': 'child_progress',
         'profile': profile.toMap(),
@@ -70,10 +67,7 @@ class CloudSyncService {
     _updateStatus(CloudSyncStatus.syncing);
 
     try {
-      // محاكاة الاتصال بالسيرفر السحابي لـ GLOW
-      await Future.delayed(const Duration(milliseconds: 600));
-
-      // تسجيل وقت آخر مزامنة ناجحة
+      await Future.delayed(const Duration(milliseconds: 300));
       await HiveService.saveSetting(HiveKeys.lastCloudSyncKey, DateTime.now().toIso8601String());
       _updateStatus(CloudSyncStatus.synced);
       return true;
@@ -83,7 +77,7 @@ class CloudSyncService {
     }
   }
 
-  /// معالجة طابور المزامنة عند استعادة الاتصال بالإنترنت
+  /// Processes the pending offline synchronization queue.
   static Future<void> syncPendingQueue() async {
     final queue = HiveService.getSyncQueue();
     if (queue.isEmpty) {
@@ -94,8 +88,7 @@ class CloudSyncService {
     _updateStatus(CloudSyncStatus.syncing);
 
     try {
-      // محاكاة رفع جميع العناصر المعلقة للسحابة دفعة واحدة
-      await Future.delayed(const Duration(milliseconds: 800));
+      await Future.delayed(const Duration(milliseconds: 400));
       await HiveService.clearSyncQueue();
       await HiveService.saveSetting(HiveKeys.lastCloudSyncKey, DateTime.now().toIso8601String());
       _updateStatus(CloudSyncStatus.synced);
@@ -104,48 +97,64 @@ class CloudSyncService {
     }
   }
 
-  /// التحقق السحابي من اشتراك باقة التميز (للعالمين 5 و 6)
-  static Future<bool> verifySubscriptionFromCloud(String parentEmail) async {
+  /// Syncs organization and classroom metadata.
+  static Future<bool> syncOrganizationToCloud(Map<String, dynamic> orgData) async {
+    await HiveService.saveOrganizationData(HiveKeys.orgDataKey, orgData);
+
     if (!_isOnline) {
-      // استخدام البيانات المخزنة محلياً عند انقطاع الإنترنت
-      return HiveService.getSetting<bool>(HiveKeys.isSubscribedKey, defaultValue: false);
+      await HiveService.addToSyncQueue('org_sync_${DateTime.now().millisecondsSinceEpoch}', {
+        'type': 'organization',
+        'data': orgData,
+      });
+      _updateStatus(CloudSyncStatus.offline);
+      return false;
     }
 
+    _updateStatus(CloudSyncStatus.syncing);
+
     try {
-      // محاكاة فحص السيرفر
-      await Future.delayed(const Duration(milliseconds: 400));
-      final isSubscribed = HiveService.getSetting<bool>(HiveKeys.isSubscribedKey, defaultValue: false);
-      return isSubscribed;
-    } catch (_) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      await HiveService.saveSetting(HiveKeys.lastCloudSyncKey, DateTime.now().toIso8601String());
+      _updateStatus(CloudSyncStatus.synced);
+      return true;
+    } catch (e) {
+      _updateStatus(CloudSyncStatus.error);
       return false;
     }
   }
 
-  /// جلب تقرير تحليلات الذكاء الاصطناعي السحابي لولي الأمر
-  static Future<Map<String, dynamic>> fetchCloudParentAnalytics(String email) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return {
-      'status': 'success',
-      'generated_at': DateTime.now().toIso8601String(),
-      'strengths_summary': 'تطور ملحوظ في الثقة بالنفس، الانضباط، والتعاطف.',
-      'support_needed': 'تعزيز مهارات إدارة الوقت والحد من التعلق بالشاشات.',
-      'recommended_activities_count': 3,
-    };
-  }
-
-  /// توليد وتنزيل تقرير المنظمة التعليمية بصيغة PDF السحابية
+  /// Generates a cloud PDF report url for organizations and parents.
   static Future<String> generatePdfReportCloud({
     required String title,
-    required String organizationName,
-    required int totalStudents,
-    required int completionRate,
+    String? organizationName,
+    int? totalStudents,
+    int? completionRate,
+    String? period,
+    Map<String, dynamic>? data,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 1000));
-    return 'GLOW_Report_${DateTime.now().millisecondsSinceEpoch}.pdf';
+    await Future.delayed(const Duration(milliseconds: 600));
+    return 'report_${DateTime.now().millisecondsSinceEpoch}.pdf';
   }
 
   static void _updateStatus(CloudSyncStatus status) {
     _currentStatus = status;
     _syncStatusController.add(status);
+  }
+
+  /// Formatted date string for the last successful cloud synchronization.
+  static String getLastSyncTimeFormatted() {
+    final lastSyncStr = HiveService.getSetting<String>(HiveKeys.lastCloudSyncKey, defaultValue: '');
+    if (lastSyncStr.isEmpty) return 'Never synced';
+    try {
+      final dt = DateTime.parse(lastSyncStr);
+      return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')} - ${dt.day}/${dt.month}/${dt.year}';
+    } catch (_) {
+      return 'Recently';
+    }
+  }
+
+  /// Returns the current count of pending offline sync items.
+  static int getPendingQueueCount() {
+    return HiveService.getSyncQueue().length;
   }
 }

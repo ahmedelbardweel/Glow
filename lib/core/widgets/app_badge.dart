@@ -9,7 +9,6 @@ enum AppBadgeType {
   custom,
 }
 
-/// شارة موحدة للحالات والوسوم تعتمد على AppRadius وبدون أيقونات أو إيموجي
 class AppBadge extends StatelessWidget {
   final String text;
   final Color? color;

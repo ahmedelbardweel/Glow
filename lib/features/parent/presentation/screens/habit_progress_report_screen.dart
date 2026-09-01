@@ -12,8 +12,7 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../data/models/parent_models.dart';
 import '../bloc/parent_bloc.dart';
 
-/// 3. شاشة العادات والتقرير (Habit Progress & Child Report)
-/// تتبع 30 عادة أساسية وحالتها، مع استعراض نقاط القوة واقتراحات الدعم الموجهة لولي الأمر
+/// Progress report and analytics screen.
 class HabitProgressReportScreen extends StatefulWidget {
   const HabitProgressReportScreen({super.key});
 
@@ -22,7 +21,7 @@ class HabitProgressReportScreen extends StatefulWidget {
 }
 
 class _HabitProgressReportScreenState extends State<HabitProgressReportScreen> {
-  String _selectedFilter = 'الكل'; // الكل، مكتسبة، قيد التعلم، مقفلة
+  String _selectedFilter = 'الكل';
 
   void _showHabitDetails(HabitModel habit) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -63,7 +62,7 @@ class _HabitProgressReportScreenState extends State<HabitProgressReportScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              // بطاقة نقاط القوة
+              // Information card.
               AppCard(
                 backgroundColor: isDark ? AppColors.darkSurfaceVariant : AppColors.mintGreen.withValues(alpha: 0.1),
                 borderColor: AppColors.mintGreen,
@@ -90,7 +89,7 @@ class _HabitProgressReportScreenState extends State<HabitProgressReportScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              // بطاقة الدعم الأسري
+              // Information card.
               AppCard(
                 backgroundColor: isDark ? AppColors.darkSurfaceVariant : AppColors.coralOrange.withValues(alpha: 0.1),
                 borderColor: AppColors.coralOrange,
@@ -186,7 +185,6 @@ class _HabitProgressReportScreenState extends State<HabitProgressReportScreen> {
           ],
           body: Column(
             children: [
-              // شرائح التصفية
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: ['الكل', 'مكتسبة', 'قيد التعلم', 'مقفلة'].map((filter) {
@@ -200,7 +198,6 @@ class _HabitProgressReportScreenState extends State<HabitProgressReportScreen> {
 
               const SizedBox(height: 12),
 
-              // قائمة العادات الـ 30
               Expanded(
                 child: ListView.separated(
                   itemCount: habits.length,

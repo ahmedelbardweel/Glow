@@ -1,7 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'hive_keys.dart';
 
-/// خدمة إدارة وتخزين البيانات المحلية والمزامنة السحابية باستخدام Hive
+/// Local persistence service backed by Hive boxes.
 class HiveService {
   HiveService._();
 
@@ -11,8 +11,9 @@ class HiveService {
   static late Box _organizationBox;
   static late Box _storyProgressBox;
   static late Box _syncQueueBox;
+  static late Box _dynamicContentBox;
 
-  /// تهيئة Hive وفتح الصناديق الأساسية
+  /// Initializes Hive and opens required boxes.
   static Future<void> init() async {
     await Hive.initFlutter();
 
@@ -22,9 +23,10 @@ class HiveService {
     _organizationBox = await Hive.openBox(HiveKeys.organizationBox);
     _storyProgressBox = await Hive.openBox(HiveKeys.storyProgressBox);
     _syncQueueBox = await Hive.openBox(HiveKeys.syncQueueBox);
+    _dynamicContentBox = await Hive.openBox(HiveKeys.dynamicContentBox);
   }
 
-  // === إعدادات عامة (Settings) ===
+  // === App Settings ===
   static Future<void> saveSetting<T>(String key, T value) async {
     await _settingsBox.put(key, value);
   }
@@ -33,7 +35,7 @@ class HiveService {
     return _settingsBox.get(key, defaultValue: defaultValue) as T;
   }
 
-  // === بيانات الطفل (Child Data) ===
+  // === Child Profile & State ===
   static Future<void> saveChildData<T>(String key, T value) async {
     await _childBox.put(key, value);
   }
@@ -42,7 +44,7 @@ class HiveService {
     return _childBox.get(key, defaultValue: defaultValue) as T?;
   }
 
-  // === حفظ تقدم القصة (Story Scene Progress) ===
+  // === Story Scene Progress Tracking ===
   static Future<void> saveStoryScene(String missionId, int sceneIndex) async {
     await _storyProgressBox.put(missionId, sceneIndex);
   }
@@ -55,7 +57,7 @@ class HiveService {
     await _storyProgressBox.delete(missionId);
   }
 
-  // === بيانات العادات (Habits) ===
+  // === Habits Tracking ===
   static Future<void> saveHabitStatus(String habitId, String status) async {
     await _habitsBox.put(habitId, status);
   }
@@ -64,8 +66,12 @@ class HiveService {
     return _habitsBox.toMap();
   }
 
-  // === بيانات المنظمة (Organization) ===
+  // === Organization Metadata ===
   static Future<void> saveOrgData<T>(String key, T value) async {
+    await _organizationBox.put(key, value);
+  }
+
+  static Future<void> saveOrganizationData<T>(String key, T value) async {
     await _organizationBox.put(key, value);
   }
 
@@ -73,7 +79,7 @@ class HiveService {
     return _organizationBox.get(key, defaultValue: defaultValue) as T?;
   }
 
-  // === طابور المزامنة السحابية (Cloud Sync Queue) ===
+  // === Offline Sync Queue ===
   static Future<void> addToSyncQueue(String key, Map<String, dynamic> data) async {
     await _syncQueueBox.put(key, {
       ...data,
@@ -93,7 +99,36 @@ class HiveService {
     await _syncQueueBox.clear();
   }
 
-  /// مسح جميع البيانات (إعادة ضبط المصنع للتجربة)
+  // === Dynamic Content Caching ===
+  static Future<void> saveCachedWorlds(List<Map<String, dynamic>> worldsData) async {
+    await _dynamicContentBox.put(HiveKeys.cachedWorldsKey, worldsData);
+  }
+
+  static List<Map<String, dynamic>>? getCachedWorlds() {
+    final raw = _dynamicContentBox.get(HiveKeys.cachedWorldsKey);
+    if (raw == null) return null;
+    try {
+      return (raw as List<dynamic>).map((item) => Map<String, dynamic>.from(item as Map)).toList();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static Future<void> saveCachedAnnouncements(List<Map<String, dynamic>> announcementsData) async {
+    await _dynamicContentBox.put(HiveKeys.cachedAnnouncementsKey, announcementsData);
+  }
+
+  static List<Map<String, dynamic>> getCachedAnnouncements() {
+    final raw = _dynamicContentBox.get(HiveKeys.cachedAnnouncementsKey);
+    if (raw == null) return [];
+    try {
+      return (raw as List<dynamic>).map((item) => Map<String, dynamic>.from(item as Map)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// Wipes all local Hive storage for development and test scenarios.
   static Future<void> clearAll() async {
     await _settingsBox.clear();
     await _childBox.clear();
@@ -101,5 +136,6 @@ class HiveService {
     await _organizationBox.clear();
     await _storyProgressBox.clear();
     await _syncQueueBox.clear();
+    await _dynamicContentBox.clear();
   }
 }

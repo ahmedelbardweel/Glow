@@ -9,8 +9,7 @@ import '../../../../core/widgets/shapes/port_shape_avatar.dart';
 import '../../data/models/child_models.dart';
 import 'mission_result_screen.dart';
 
-/// 11. شاشة الإجابة الصحيحة (Correct Answer)
-/// احتفال بصري وتعزيز إيجابي فوري ("برافوو يا بطل!")
+/// Application feature screen.
 class CorrectAnswerScreen extends StatelessWidget {
   final MissionModel mission;
 
@@ -30,7 +29,7 @@ class CorrectAnswerScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // شخصية PORT المحتفلة
+              // Interactive 3D character component.
               const Center(
                 child: PortShapeAvatar(
                   characterName: 'PORT',
@@ -40,7 +39,7 @@ class CorrectAnswerScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // بطاقة الاحتفال والتشجيع
+              // Information card.
               AppCard(
                 backgroundColor: isDark ? AppColors.darkSurface : AppColors.softMintBackground,
                 borderWidth: 1,
@@ -85,7 +84,7 @@ class CorrectAnswerScreen extends StatelessWidget {
 
               const SizedBox(height: 32),
 
-              // زر الانتقال إلى النتيجة
+              // Action button.
               AppButton(
                 text: 'استلام المكافأة والنجوم',
                 variant: AppButtonVariant.primary,

@@ -3,11 +3,11 @@ import 'app_colors.dart';
 import 'app_radius.dart';
 import 'app_typography.dart';
 
-/// تكوين السمة الكاملة لتطبيق PORT مع دعم Light و Dark Theme
+/// Application theme configuration.
 class AppTheme {
   AppTheme._();
 
-  // === السمة النهارية (Light Theme) ===
+  // Application theme configuration.
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -80,7 +80,7 @@ class AppTheme {
     );
   }
 
-  // === السمة الليلية (Dark Theme) ===
+  // Application theme configuration.
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,

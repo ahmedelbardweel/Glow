@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// رسام هندسي كرتوني بديع لمشاهد العوالم الستة بدون أي صور خارجية
 class WorldSceneryPainter extends CustomPainter {
   final int worldNumber;
   final bool isUnlocked;
@@ -40,7 +39,6 @@ class WorldSceneryPainter extends CustomPainter {
     }
   }
 
-  /// عالم 1: غابة البدايات (تلال خضراء، أشجار صنوبر، شمس مشرقة، سحب لطيفة)
   void _drawForestScenery(Canvas canvas, Size size, Rect rect) {
     final skyPaint = Paint()
       ..shader = LinearGradient(
@@ -84,7 +82,6 @@ class WorldSceneryPainter extends CustomPainter {
     _drawPineTree(canvas, Offset(size.width * 0.88, size.height * 0.70), 18, 30, isUnlocked ? const Color(0xFF1B5E20) : const Color(0xFF424242));
   }
 
-  /// عالم 2: محيط المشاعر (أمواج مائية هادئة، منارة، شمس ذهبية)
   void _drawOceanScenery(Canvas canvas, Size size, Rect rect) {
     final skyPaint = Paint()
       ..shader = LinearGradient(
@@ -125,7 +122,6 @@ class WorldSceneryPainter extends CustomPainter {
     canvas.drawPath(p2, wave2);
   }
 
-  /// عالم 3: جبال التحديات (قمم صخرية برتقالية، صخور شامخة)
   void _drawMountainScenery(Canvas canvas, Size size, Rect rect) {
     final skyPaint = Paint()
       ..shader = LinearGradient(
@@ -160,7 +156,6 @@ class WorldSceneryPainter extends CustomPainter {
     canvas.drawPath(p2, m2);
   }
 
-  /// عالم 4: مملكة الحكمة (أبراج وقلاع شمسية، كتب وأشعة)
   void _drawKingdomScenery(Canvas canvas, Size size, Rect rect) {
     final skyPaint = Paint()
       ..shader = LinearGradient(
@@ -179,7 +174,6 @@ class WorldSceneryPainter extends CustomPainter {
     final tPaint = Paint()
       ..color = (isUnlocked ? const Color(0xFFFBC02D) : const Color(0xFF757575)).withValues(alpha: isDark ? 0.6 : 0.95);
 
-    // برج الحكمة
     final bPath = Path()
       ..moveTo(size.width * 0.4, size.height)
       ..lineTo(size.width * 0.4, size.height * 0.5)
@@ -190,7 +184,7 @@ class WorldSceneryPainter extends CustomPainter {
     canvas.drawPath(bPath, tPaint);
   }
 
-  /// عالم 5: واحة الإبداع (ألوان بنفسجية، إشراقات الابتكار)
+  /// Application color palette design tokens.
   void _drawOasisScenery(Canvas canvas, Size size, Rect rect) {
     final skyPaint = Paint()
       ..shader = LinearGradient(
@@ -217,7 +211,6 @@ class WorldSceneryPainter extends CustomPainter {
     canvas.drawPath(p, hill);
   }
 
-  /// عالم 6: قمة الإنجاز (قمم ذهبية شامخة وراية النصر)
   void _drawSummitScenery(Canvas canvas, Size size, Rect rect) {
     final skyPaint = Paint()
       ..shader = LinearGradient(

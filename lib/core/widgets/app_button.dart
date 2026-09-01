@@ -12,8 +12,8 @@ enum AppButtonVariant {
   soft,
 }
 
-/// زر موحد لكافة شاشات التطبيق
-/// يعتمد بالكامل على AppRadius لتوحيد حواف الأزرار في كل مكان
+/// Action button.
+/// Action button.
 class AppButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -97,12 +97,17 @@ class AppButton extends StatelessWidget {
             ),
           )
         else
-          Text(
-            text,
-            style: AppTypography.labelLarge.copyWith(
-              color: textColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: AppTypography.labelLarge.copyWith(
+                color: textColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 17,
+              ),
             ),
           ),
         if (trailing != null) ...[
@@ -126,7 +131,7 @@ class AppButton extends StatelessWidget {
           onTap: isLoading ? null : onPressed,
           borderRadius: AppRadius.button,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Center(child: buttonContent),
           ),
         ),
