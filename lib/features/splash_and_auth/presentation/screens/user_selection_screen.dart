@@ -179,7 +179,7 @@ class UserSelectionScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'التحكم بالعوالم والمهام والقصص والأسئلة و Supabase',
+                        'التحكم بالعوالم والمهام والقصص والأسئلة',
                         style: AppTypography.bodySmall.copyWith(
                           color: isDark ? AppColors.darkTextSecondary : AppColors.textMuted,
                           fontSize: 11,

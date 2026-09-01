@@ -10,7 +10,7 @@ import '../bloc/quiz_bloc.dart';
 import 'correct_answer_screen.dart';
 import 'wrong_answer_screen.dart';
 
-/// Interactive scenario challenge screen.
+/// Interactive scenario challenge screen supporting 10 multi-question quizzes.
 class QuizScreen extends StatefulWidget {
   final MissionModel mission;
 
@@ -34,17 +34,45 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final quiz = widget.mission.quiz;
 
     return BlocConsumer<QuizBloc, QuizState>(
       listener: (context, state) {
-        if (state.status == QuizStatus.answeredCorrect) {
+        if (state.status == QuizStatus.completed) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (_) => CorrectAnswerScreen(mission: widget.mission),
             ),
           );
+        } else if (state.status == QuizStatus.answeredCorrect) {
+          // Show quick celebration snackbar and move to next question.
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.star_rounded, color: Colors.amber, size: 24),
+                  const SizedBox(width: 8),
+                  Text(
+                    'إجابة صحيحة يا بطل! أحسنت 👏 (${state.currentQuestionIndex + 1}/${state.totalQuestions})',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              backgroundColor: AppColors.sageGreen,
+              duration: const Duration(milliseconds: 1400),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          );
+
+          final quizBloc = context.read<QuizBloc>();
+          Future.delayed(const Duration(milliseconds: 600), () {
+            if (mounted) {
+              quizBloc.add(NextQuestionEvent());
+            }
+          });
         } else if (state.status == QuizStatus.answeredWrong) {
+          final quizBloc = context.read<QuizBloc>();
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => WrongAnswerScreen(
@@ -52,17 +80,78 @@ class _QuizScreenState extends State<QuizScreen> {
                 selectedOption: state.selectedOption,
               ),
             ),
-          );
+          ).then((_) {
+            if (mounted) {
+              quizBloc.add(ResetQuizEvent());
+            }
+          });
         }
       },
       builder: (context, state) {
+        final quiz = state.currentQuiz;
+        final questionNum = state.currentQuestionIndex + 1;
+        final totalQuestions = state.totalQuestions;
+        final progress = (questionNum / totalQuestions).clamp(0.0, 1.0);
+
         return AppScaffold(
           title: 'تحدي: ${widget.mission.habitName}',
-          subtitle: 'اختر الإجابة الصحيحة يا بطل',
+          subtitle: 'السؤال $questionNum من $totalQuestions',
           showBackButton: true,
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Progress Bar
+              Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'تقدم التحدي',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.textMuted,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.terracottaOrange.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '$questionNum / $totalQuestions',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.terracottaOrange,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: TweenAnimationBuilder<double>(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                        tween: Tween<double>(begin: 0, end: progress),
+                        builder: (context, val, _) => LinearProgressIndicator(
+                          value: val,
+                          minHeight: 8,
+                          backgroundColor: isDark ? AppColors.darkBorder : const Color(0xFFEBE5DF),
+                          valueColor: const AlwaysStoppedAnimation<Color>(AppColors.terracottaOrange),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               // Information card.
               AppCard(
                 backgroundColor: isDark ? AppColors.darkSurface : AppColors.pureWhite,
@@ -72,20 +161,33 @@ class _QuizScreenState extends State<QuizScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppColors.terracottaOrange,
-                        borderRadius: AppRadius.badge,
-                      ),
-                      child: const Text(
-                        'الموقف التفاعلي',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.terracottaOrange,
+                            borderRadius: AppRadius.badge,
+                          ),
+                          child: const Text(
+                            'الموقف التفاعلي',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ),
+                        Text(
+                          'سؤال $questionNum',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? AppColors.darkTextSecondary : AppColors.textMuted,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
                     Text(
@@ -93,6 +195,7 @@ class _QuizScreenState extends State<QuizScreen> {
                       style: AppTypography.bodyLarge.copyWith(
                         color: isDark ? AppColors.darkTextPrimary : AppColors.textCharcoal,
                         fontWeight: FontWeight.w600,
+                        height: 1.4,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -176,3 +279,4 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 }
+

@@ -530,96 +530,103 @@ class _WorldMapScreenState extends State<WorldMapScreen> {
                         width: 1,
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: List.generate(totalCount, (mIndex) {
-                        final mission = worldMissions[mIndex];
-                        final isMissionDone =
-                            completedMissions.contains(mission.id);
-                        final isCurrentActive = mIndex == 0 ||
-                            completedMissions
-                                .contains(worldMissions[mIndex - 1].id);
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: List.generate(totalCount, (mIndex) {
+                          final mission = worldMissions[mIndex];
+                          final isMissionDone =
+                              completedMissions.contains(mission.id);
+                          final isCurrentActive = mIndex == 0 ||
+                              completedMissions
+                                  .contains(worldMissions[mIndex - 1].id);
 
-                        return Column(
-                          children: [
-                            InkWell(
-                              onTap: isCurrentActive || isMissionDone
-                                  ? () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              MissionSelectionScreen(
-                                                  mission: mission),
-                                        ),
-                                      );
-                                    }
-                                  : null,
-                              child: Container(
-                                width: 38,
-                                height: 38,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: isMissionDone
-                                      ? AppColors.sageGreen
-                                      : (isCurrentActive
-                                          ? AppColors.terracottaOrange
-                                          : (isDark
-                                              ? AppColors.darkBorder
-                                              : const Color(0xFFD6CECE))),
-                                  border: Border.all(
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            child: Column(
+                              children: [
+                                InkWell(
+                                  onTap: isCurrentActive || isMissionDone
+                                      ? () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  MissionSelectionScreen(
+                                                      mission: mission),
+                                            ),
+                                          );
+                                        }
+                                      : null,
+                                  child: Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: isMissionDone
+                                          ? AppColors.sageGreen
+                                          : (isCurrentActive
+                                              ? AppColors.terracottaOrange
+                                              : (isDark
+                                                  ? AppColors.darkBorder
+                                                  : const Color(0xFFD6CECE))),
+                                      border: Border.all(
+                                        color: isMissionDone
+                                            ? AppColors.sageGreen
+                                            : (isCurrentActive
+                                                ? AppColors.terracottaOrange
+                                                : (isDark
+                                                    ? AppColors.darkBorder
+                                                    : AppColors.lightBorder)),
+                                        width: 1.5,
+                                      ),
+                                      boxShadow: isCurrentActive
+                                          ? [
+                                              BoxShadow(
+                                                color: AppColors.terracottaOrange
+                                                    .withValues(alpha: 0.3),
+                                                blurRadius: 6,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ]
+                                          : null,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      '${mIndex + 1}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  isMissionDone
+                                      ? 'مكتملة'
+                                      : (isCurrentActive ? 'ابدأ' : 'قادمة'),
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: isMissionDone || isCurrentActive
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
                                     color: isMissionDone
                                         ? AppColors.sageGreen
                                         : (isCurrentActive
                                             ? AppColors.terracottaOrange
                                             : (isDark
-                                                ? AppColors.darkBorder
-                                                : AppColors.lightBorder)),
-                                    width: 1.5,
-                                  ),
-                                  boxShadow: isCurrentActive
-                                      ? [
-                                          BoxShadow(
-                                            color: AppColors.terracottaOrange
-                                                .withValues(alpha: 0.3),
-                                            blurRadius: 6,
-                                            offset: const Offset(0, 2),
-                                          ),
-                                        ]
-                                      : null,
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  '${mIndex + 1}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 14,
+                                                ? AppColors.darkTextSecondary
+                                                : AppColors.textMuted)),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              isMissionDone
-                                  ? 'مكتملة'
-                                  : (isCurrentActive ? 'ابدأ' : 'قادمة'),
-                              style: TextStyle(
-                                fontSize: 9,
-                                fontWeight: isMissionDone || isCurrentActive
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: isMissionDone
-                                    ? AppColors.sageGreen
-                                    : (isCurrentActive
-                                        ? AppColors.terracottaOrange
-                                        : (isDark
-                                            ? AppColors.darkTextSecondary
-                                            : AppColors.textMuted)),
-                              ),
-                            ),
-                          ],
-                        );
-                      }),
+                          );
+                        }),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 14),

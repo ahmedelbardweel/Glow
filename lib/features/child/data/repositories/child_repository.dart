@@ -2,6 +2,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/database/hive_service.dart';
 import '../../../../core/database/hive_keys.dart';
 import '../models/child_models.dart';
+import 'world1_quizzes_data.dart';
 
 /// Interactive 3D character component.
 class ChildRepository {
@@ -25,22 +26,22 @@ class ChildRepository {
             StorySceneModel(
               sceneIndex: 0,
               speakerName: 'PORT',
-              dialogue: 'مرحباً بك يا بطلي! أنا PORT رفيقك وقائد رحلتك في غابة البدايات. اليوم سنكتشف قوة الثقة بالنفس.',
+              dialogue: 'مرحباً بك يا بطلي! أنا PORT رفيقك وقائد رحلتك في غابة البدايات. اليوم سنكتشف قوة الثقة بالنفس والاعتزاز بقدراتنا.',
               sceneDescription: 'يقف PORT في مدخل الغابة الخضراء المشرقة ملوحاً بحماس لبدء الرحلة.',
               backgroundTheme: 'forest_day',
             ),
             StorySceneModel(
               sceneIndex: 1,
-              speakerName: 'PORT',
-              dialogue: 'واجهنا جسراً خشبياً فوق النهر الهادئ. بالإرادة والهدوء نتجاوز كل خطوة بثقة ونجاح.',
-              sceneDescription: 'جسر خشبي أنيق يمتد بين ضفتي النهر العذب.',
+              speakerName: 'FORT',
+              dialogue: 'أنا FORT وأحب المغامرات! عندما ننظر للأمام بشجاعة وابتسامة، تصبح كل التحديات سهلة وممتعة.',
+              sceneDescription: 'FORT يقفز بنشاط مشجعاً على المضي قدماً.',
               backgroundTheme: 'forest_bridge',
             ),
             StorySceneModel(
               sceneIndex: 2,
               speakerName: 'PORT',
-              dialogue: 'عندما نؤمن بقدراتنا، نصبح أقوياء ونسعد من حولنا. هل أنت مستعد للتحدي الذكي؟',
-              sceneDescription: 'PORT يقفز بحماس في نهاية الجسر مشجعاً صديقه الصغير.',
+              dialogue: 'واجهنا جسراً خشبياً فوق النهر الهادئ. بالإرادة والهدوء نتجاوز كل خطوة بثقة ونجاح نحو القمة.',
+              sceneDescription: 'جسر خشبي أنيق يمتد بين ضفتي النهر العذب.',
               backgroundTheme: 'forest_finish',
             ),
           ],
@@ -86,16 +87,23 @@ class ChildRepository {
             StorySceneModel(
               sceneIndex: 0,
               speakerName: 'PORT',
-              dialogue: 'أهلاً بك مجدداً! اليوم يحتاج أصدقاؤنا إلى زراعة أزهار جديدة وترتيب حديقة الغابة.',
+              dialogue: 'أهلاً بك مجدداً! اليوم يحتاج أصدقاؤنا إلى زراعة أزهار جديدة وترتيب حديقة الغابة الجميلة.',
               sceneDescription: 'حديقة واسعة تحتاج لترتيب وغرس الشتلات الملونة.',
               backgroundTheme: 'garden_start',
             ),
             StorySceneModel(
               sceneIndex: 1,
               speakerName: 'MORT',
-              dialogue: 'أنا MORT أحب العطف والتعاون! عندما نضع أيدينا معاً يصبح العمل ممتعاً وسهلاً.',
+              dialogue: 'أنا MORT أحب العطف والمساعدة! عندما نضع أيدينا معاً يصبح العمل الشاق نزهة ممتعة ومليئة بالفرح.',
               sceneDescription: 'MORT يساعد في حمل الماء برفق ومحبة.',
               backgroundTheme: 'garden_work',
+            ),
+            StorySceneModel(
+              sceneIndex: 2,
+              speakerName: 'QORT',
+              dialogue: 'وأنا QORT الحكيم أقول لكم: التعاون يبني أجمل الحدائق وأقوى الصداقات التي تدوم طويلاً.',
+              sceneDescription: 'QORT يشير إلى الأزهار المتفتحة بجمال.',
+              backgroundTheme: 'garden_finish',
             ),
           ],
           quiz: QuizModel(
@@ -144,6 +152,20 @@ class ChildRepository {
               sceneDescription: 'ينبوع ماء كريستالي صافٍ تتراقص حوله قطرات الندى.',
               backgroundTheme: 'spring_water',
             ),
+            StorySceneModel(
+              sceneIndex: 1,
+              speakerName: 'FORT',
+              dialogue: 'غسل اليدين بالماء والصابون وترتيب غرفتنا يجعلنا نشعر بالطاقة والقوة في كل صباح!',
+              sceneDescription: 'FORT يغسل يديه بسعادة تحت الينبوع.',
+              backgroundTheme: 'spring_clean',
+            ),
+            StorySceneModel(
+              sceneIndex: 2,
+              speakerName: 'MORT',
+              dialogue: 'المكان النظيف يعكس جمال قلوبنا. لنحافظ دائماً على نظافة بيئتنا وأدواتنا لتبدو لامعة.',
+              sceneDescription: 'MORT يبتسم مشيراً للمكان المرتب والنظيف.',
+              backgroundTheme: 'spring_finish',
+            ),
           ],
           quiz: QuizModel(
             situation: 'بعد الانتهاء من تناول وجبة الغداء اللذيذة مع الأسرة:',
@@ -190,6 +212,20 @@ class ChildRepository {
               dialogue: 'الصدق شجاعة حقيقية، وقول الحقيقة ينير دربنا ويبني ثقة الناس بنا دائماً.',
               sceneDescription: 'شجرة الصدق الوارفة تتلألأ بثمار المعرفة.',
               backgroundTheme: 'truth_tree',
+            ),
+            StorySceneModel(
+              sceneIndex: 1,
+              speakerName: 'MORT',
+              dialogue: 'حتى لو أخطأنا، فالاعتراف بالخطأ بصدق ولطف يجعلنا أبطالاً حقيقيين محبوبين لدى الجميع.',
+              sceneDescription: 'MORT يشجع بحنان على قول الحق.',
+              backgroundTheme: 'truth_speak',
+            ),
+            StorySceneModel(
+              sceneIndex: 2,
+              speakerName: 'FORT',
+              dialogue: 'الصدق كنز لا يفنى، ومن يقل الصدق يعش مرتاح البال ومرفوع الرأس بين أصدقائه.',
+              sceneDescription: 'FORT يرفع شعلة الأمانة المضيئة.',
+              backgroundTheme: 'truth_finish',
             ),
           ],
           quiz: QuizModel(
@@ -238,6 +274,20 @@ class ChildRepository {
               sceneDescription: 'سماء هادئة مليئة بالنجوم المضيئة والقمر المبتسم.',
               backgroundTheme: 'starry_night',
             ),
+            StorySceneModel(
+              sceneIndex: 1,
+              speakerName: 'QORT',
+              dialogue: 'النوم المبكر ينظم دقات القلب ويصفي الذهن لنستيقظ في الصباح بكامل الذكاء والتركيز.',
+              sceneDescription: 'QORT ينظر للنجوم ويشرح أهمية راحة العقل.',
+              backgroundTheme: 'starry_rest',
+            ),
+            StorySceneModel(
+              sceneIndex: 2,
+              speakerName: 'PORT',
+              dialogue: 'أغمض عينيك الليلة بابتسامة، فالغد ينتظرك بمغامرات أروع وأجمل يا صديقي البطل!',
+              sceneDescription: 'PORT يلوح متمنياً نوماً هنيئاً وأحلاماً سعيدة.',
+              backgroundTheme: 'starry_finish',
+            ),
           ],
           quiz: QuizModel(
             situation: 'حان وقت النوم المحدد لك ولديك غداً مغامرة مدرسية شيقة:',
@@ -267,6 +317,318 @@ class ChildRepository {
             correctKeyId: 'A',
             encouragementCorrect: 'أحسنت يا بطل! النوم المبكر يصنع الأبطال الأذكياء.',
             gentleFeedbackWrong: 'محاولة جميلة! راحة الجسم ضرورية لتستيقظ بكامل طاقتك وإبداعك.',
+          ),
+        ),
+        MissionModel(
+          id: 'w1_m6',
+          number: 6,
+          title: 'احترام المواعيد',
+          habitName: 'إدارة الوقت والالتزام',
+          habitDescription: 'الحرص على أداء المهام في أوقاتها المحددة واحترام وقت الآخرين.',
+          rewardStars: 3,
+          rewardPoints: 150,
+          storyScenes: [
+            StorySceneModel(
+              sceneIndex: 0,
+              speakerName: 'PORT',
+              dialogue: 'الوقت كنز ثمين يا أصدقائي! والالتزام بالمواعيد يعكس احترامنا لأنفسنا وللآخرين.',
+              sceneDescription: 'ساعة الغابة الكبيرة تدق بنغمات موسيقية منظمة.',
+              backgroundTheme: 'clock_tower',
+            ),
+            StorySceneModel(
+              sceneIndex: 1,
+              speakerName: 'FORT',
+              dialogue: 'عندما ننجز واجباتنا أولاً في وقتها المحدد، نجد متسعاً كبيراً للعب والمرح دون قلق!',
+              sceneDescription: 'FORT يرتب جدول أعماله اليومي بنشاط.',
+              backgroundTheme: 'clock_schedule',
+            ),
+            StorySceneModel(
+              sceneIndex: 2,
+              speakerName: 'QORT',
+              dialogue: 'البطل الناجح هو من يقدر كل دقيقة ويجعل يومه مليئاً بالإنجاز والابتسامة.',
+              sceneDescription: 'QORT يقف بثقة بجوار الساعة الذهبية.',
+              backgroundTheme: 'clock_finish',
+            ),
+          ],
+          quiz: QuizModel(
+            situation: 'لديك واجب مدرسي وموعد لمشاهدة برنامجك المفضل:',
+            question: 'كيف تنظم وقتك بذكاء؟',
+            options: [
+              QuizOptionModel(
+                keyId: 'A',
+                text: 'أنهي واجبي بتركيز أولاً، ثم استمتع بمشاهدة برنامجي براحة بال.',
+                explanation: 'أحسنت! إنجاز الأولويات أولاً هو أساس النجاح والتفوق.',
+              ),
+              QuizOptionModel(
+                keyId: 'B',
+                text: 'أشاهد التلفاز وأؤجل الواجب حتى الصباح الباكر.',
+                explanation: 'التأجيل يسبب التوتر وعدم إتقان العمل.',
+              ),
+              QuizOptionModel(
+                keyId: 'C',
+                text: 'أترك واجبي تماماً وألعب طول اليوم.',
+                explanation: 'إهمال الواجبات يقلل من تحصيلك العلمي.',
+              ),
+              QuizOptionModel(
+                keyId: 'D',
+                text: 'أكتب بسرعة وعشوائية أثناء المشاهدة.',
+                explanation: 'تشتيت الانتباه يسبب الأخطاء وضعف الفهم.',
+              ),
+            ],
+            correctKeyId: 'A',
+            encouragementCorrect: 'بطل منظم ورائع! إدارة الوقت سر من أسرار العباقرة.',
+            gentleFeedbackWrong: 'محاولة طيبة! تذكر أن إنهاء المهام أولاً يمنحك راحة وسعادة حقيقية.',
+          ),
+        ),
+        MissionModel(
+          id: 'w1_m7',
+          number: 7,
+          title: 'طاقة الغذاء الصحي',
+          habitName: 'التغذية السليمة وشرب الماء',
+          habitDescription: 'تناول الخضروات والفواكه وشرب الماء النقي لبناء جسم قوي ومناعة عالية.',
+          rewardStars: 3,
+          rewardPoints: 150,
+          storyScenes: [
+            StorySceneModel(
+              sceneIndex: 0,
+              speakerName: 'PORT',
+              dialogue: 'شجرة الفواكه الملونة ترحب بنا! الأكل الصحي يمد عضلاتنا بالقوة وعقولنا بالذكاء.',
+              sceneDescription: 'بستان مليء بالأشجار المثمرة بالتفاح والبرتقال والموز.',
+              backgroundTheme: 'orchard_start',
+            ),
+            StorySceneModel(
+              sceneIndex: 1,
+              speakerName: 'MORT',
+              dialogue: 'الخضار الطازجة وشرب الماء النقي بانتظام يحمي جسمنا ويمنحنا نشاطاً لا ينتهي.',
+              sceneDescription: 'MORT يوزع سلال الفواكه اللذيذة بحب.',
+              backgroundTheme: 'orchard_fruits',
+            ),
+            StorySceneModel(
+              sceneIndex: 2,
+              speakerName: 'FORT',
+              dialogue: 'ابتعد عن السكريات الزائدة واختر دائماً طعام الأبطال لتكون الأقوى والأسرع في كل تحدٍ!',
+              sceneDescription: 'FORT يركض بحيوية وطاقة عالية بين الأشجار.',
+              backgroundTheme: 'orchard_finish',
+            ),
+          ],
+          quiz: QuizModel(
+            situation: 'شعرت بالعطش والجوع الخفيف بين الوجبات:',
+            question: 'ما هو الخيار الأكثر صحة لجسمك؟',
+            options: [
+              QuizOptionModel(
+                keyId: 'A',
+                text: 'أشرب كوباً من الماء النقي وأتناول تفاحة أو موزة طازجة.',
+                explanation: 'اختيار عبقري! الفواكه والماء تمنحك فيتامينات وطاقة طبيعية نقية.',
+              ),
+              QuizOptionModel(
+                keyId: 'B',
+                text: 'أشرب مشروباً غازياً مليئاً بالسكريات.',
+                explanation: 'المشروبات الغازية تضر الأسنان والمعدة.',
+              ),
+              QuizOptionModel(
+                keyId: 'C',
+                text: 'آكل حلوى مصنعة ملونة ومقرمشات ضارة.',
+                explanation: 'الحلويات الزائدة تسبب الخمول وتضعف المناعة.',
+              ),
+              QuizOptionModel(
+                keyId: 'D',
+                text: 'أهمل شرب الماء تماماً.',
+                explanation: 'الماء ضروري جداً لترطيب الجسم وصحة العقل.',
+              ),
+            ],
+            correctKeyId: 'A',
+            encouragementCorrect: 'يا لك من بطل صحي وذكي! غذاؤك الصحي يبني مستقبلك القوي.',
+            gentleFeedbackWrong: 'محاولة طيبة! تذكر دائماً أن صحتك أمانة وغذاءك النظيف هو طاقتك الحقيقية.',
+          ),
+        ),
+        MissionModel(
+          id: 'w1_m8',
+          number: 8,
+          title: 'كنز الكلمات الطيبة',
+          habitName: 'اللباقة والحديث الإيجابي',
+          habitDescription: 'استخدام الكلمات المهذبة والثناء على الآخرين والابتعاد عن الألفاظ السيئة.',
+          rewardStars: 3,
+          rewardPoints: 150,
+          storyScenes: [
+            StorySceneModel(
+              sceneIndex: 0,
+              speakerName: 'PORT',
+              dialogue: 'الكلمة الطيبة كشجرة وارفة، تنشر الفرح في كل مكان وتصنع أصدقاء أوفياء في كل خطوة.',
+              sceneDescription: 'وادي الصدى المضيء يردد الكلمات الجميلة بنغمات رائعة.',
+              backgroundTheme: 'kind_words_start',
+            ),
+            StorySceneModel(
+              sceneIndex: 1,
+              speakerName: 'QORT',
+              dialogue: 'استخدام عبارات مثل شكراً، ومن فضلك، ولو سمحت تفتح لك القلوب وتجعلك مميزاً ومحبوباً.',
+              sceneDescription: 'QORT يبتسم وينصح بلباقة وحكمة.',
+              backgroundTheme: 'kind_words_echo',
+            ),
+            StorySceneModel(
+              sceneIndex: 2,
+              speakerName: 'MORT',
+              dialogue: 'عندما نتحدث بلطف وهدوء، نصبح قدوة حسنة ونسعد عائلتنا ومعلمينا في كل لحظة.',
+              sceneDescription: 'MORT يعانق أصدقاءه بمودة ولطف.',
+              backgroundTheme: 'kind_words_finish',
+            ),
+          ],
+          quiz: QuizModel(
+            situation: 'أعطاك صديقك أو والدك شيئاً جميلاً طلبته منه:',
+            question: 'ما هي الكلمة الأجمل لتقولها؟',
+            options: [
+              QuizOptionModel(
+                keyId: 'A',
+                text: 'أبتسم وأقول: شكراً جزيلاً لك، جزاك الله خيراً.',
+                explanation: 'سلوك رفيع يعبر عن التقدير والامتنان ومكارم الأخلاق.',
+              ),
+              QuizOptionModel(
+                keyId: 'B',
+                text: 'آخذ الشيء دون أن أتكلم أو أنظر إليه.',
+                explanation: 'عدم الشكر يقلل من المودة بين الناس.',
+              ),
+              QuizOptionModel(
+                keyId: 'C',
+                text: 'أقول: هذا أقل مما أردت، وأتذمر.',
+                explanation: 'التذمر يجرح مشاعر من يحاول إسعادك.',
+              ),
+              QuizOptionModel(
+                keyId: 'D',
+                text: 'أرمي الشيء على الأرض بإهمال.',
+                explanation: 'إهمال الهدايا سلوك غير لائق.',
+              ),
+            ],
+            correctKeyId: 'A',
+            encouragementCorrect: 'ما أجمل لسانك وأخلاقك! صاحب الكلمات الطيبة محبوب من الجميع دائماً.',
+            gentleFeedbackWrong: 'محاولة جميلة! تذكر أن الشكر والامتنان ينشران المحبة في كل مكان.',
+          ),
+        ),
+        MissionModel(
+          id: 'w1_m9',
+          number: 9,
+          title: 'حماية الطبيعة الخضراء',
+          habitName: 'المحافظة على البيئة والأشجار',
+          habitDescription: 'وضع المهملات في مكانها المخصص، وترشيد استهلاك الورق والمياه، والعناية بالنباتات.',
+          rewardStars: 3,
+          rewardPoints: 150,
+          storyScenes: [
+            StorySceneModel(
+              sceneIndex: 0,
+              speakerName: 'PORT',
+              dialogue: 'انظروا إلى جمال هذه الغابة والورود المتفتحة! مسؤوليتنا جميعاً الحفاظ على بيئتنا نقية وجميلة.',
+              sceneDescription: 'مرج أخضر واسع تتفتح فيه الزهور البرية وتغرد العصافير.',
+              backgroundTheme: 'nature_start',
+            ),
+            StorySceneModel(
+              sceneIndex: 1,
+              speakerName: 'FORT',
+              dialogue: 'رمي المهملات في سلتها المخصصة وعدم قطف الأزهار يحفظ بيئتنا للأجيال القادمة لتستمتع بها.',
+              sceneDescription: 'FORT يضع عبوة في صندوق إعادة التدوير بحماس.',
+              backgroundTheme: 'nature_recycle',
+            ),
+            StorySceneModel(
+              sceneIndex: 2,
+              speakerName: 'MORT',
+              dialogue: 'النباتات كائنات حية تمنحنا الأكسجين والجمال، لنعتنِ بها ونسقِها بالماء والاهتمام المستمر.',
+              sceneDescription: 'MORT يسقي شتلة صغيرة بحنان.',
+              backgroundTheme: 'nature_finish',
+            ),
+          ],
+          quiz: QuizModel(
+            situation: 'كنت في نزهة بالحديقة العامة وانتهيت من تناول وجبة خفيفة:',
+            question: 'أين تضع غلاف الطعام والعلبة الفارغة؟',
+            options: [
+              QuizOptionModel(
+                keyId: 'A',
+                text: 'أجمع كل المخلفات وأضعها في سلة المهملات المخصصة.',
+                explanation: 'بطل بيئي حقيقي! نظافة الأماكن العامة مسؤولية وواجب يعكس وعيك.',
+              ),
+              QuizOptionModel(
+                keyId: 'B',
+                text: 'أتركها على العشب الأخضر وأغادر.',
+                explanation: 'ترك المهملات يشوه الطبيعة ويؤذي الحيوانات والزوار.',
+              ),
+              QuizOptionModel(
+                keyId: 'C',
+                text: 'أرميها في بركة الماء أو تحت الشجرة.',
+                explanation: 'تلويث المياه والأشجار يضر بالبيئة والكائنات الحية.',
+              ),
+              QuizOptionModel(
+                keyId: 'D',
+                text: 'أدفنها في التراب عشوائياً.',
+                explanation: 'البلاستيك لا يتحلل ويؤذي التربة الزراعية.',
+              ),
+            ],
+            correctKeyId: 'A',
+            encouragementCorrect: 'بطل البيئة الرائع! بفضلك تظل مدينتنا وغاباتنا جنة خضراء جميلة.',
+            gentleFeedbackWrong: 'محاولة طيبة! تذكر دائماً أن النظافة العامة مظهر حضاري وشارة للأبطال.',
+          ),
+        ),
+        MissionModel(
+          id: 'w1_m10',
+          number: 10,
+          title: 'تحدي القائد الشجاع',
+          habitName: 'المثابرة والتفوق',
+          habitDescription: 'مواصلة المحاولة وعدم الاستسلام والوصول إلى الأهداف بثبات واعتزاز.',
+          rewardStars: 3,
+          rewardPoints: 200,
+          storyScenes: [
+            StorySceneModel(
+              sceneIndex: 0,
+              speakerName: 'PORT',
+              dialogue: 'مرحى! لقد وصلنا إلى قمة جبل البدايات بعد رحلة رائعة مليئة بالتعلم والعادات العظيمة.',
+              sceneDescription: 'قمة جبل شاهقة تطل على غابة البدايات كاملة تحت أشعة الشمس الذهبية.',
+              backgroundTheme: 'summit_start',
+            ),
+            StorySceneModel(
+              sceneIndex: 1,
+              speakerName: 'FORT',
+              dialogue: 'الصبر والمثابرة هما سر الوصول إلى القمة! لم نستسلم أمام أي عائق حتى حققنا هدفنا بجدارة.',
+              sceneDescription: 'FORT يرفع راية النصر والتفوق عالياً.',
+              backgroundTheme: 'summit_flag',
+            ),
+            StorySceneModel(
+              sceneIndex: 2,
+              speakerName: 'MORT',
+              dialogue: 'والآن أصبحت تمتلك عادات القادة العظماء: الصدق، النظافة، التعاون، واحترام الوقت والمواعيد.',
+              sceneDescription: 'MORT يصفق بفخر واعتزاز بالبطل الصغير.',
+              backgroundTheme: 'summit_cheer',
+            ),
+            StorySceneModel(
+              sceneIndex: 3,
+              speakerName: 'QORT',
+              dialogue: 'فخورون بك جميعاً يا بطل GLOW! استعد الآن للحصول على وسام غابة البدايات الذهبي والانطلاق للعالم التالي!',
+              sceneDescription: 'QORT يمسك بالوسام الذهبي اللامع وسط احتفال أبطال GLOW.',
+              backgroundTheme: 'summit_trophy',
+            ),
+          ],
+          quiz: QuizModel(
+            situation: 'واجهتك مسألة رياضية أو لعبة تركيب صعبة ولم تنجح من أول محاولة:',
+            question: 'ما هو تصرف القائد المثابر؟',
+            options: [
+              QuizOptionModel(
+                keyId: 'A',
+                text: 'أهدأ، وأفكر بطريقة جديدة، وأحاول مرة بعد أخرى حتى أنجح بتفوق.',
+                explanation: 'هذه عقلية الأبطال! الإصرار والمحاولة هما طريق كل نجاح واكتشاف عظيم.',
+              ),
+              QuizOptionModel(
+                keyId: 'B',
+                text: 'أغضب وأرمي اللعبة أو الورقة وأستسلم.',
+                explanation: 'الاستسلام يحرمك من متعة الفوز والتعلم.',
+              ),
+              QuizOptionModel(
+                keyId: 'C',
+                text: 'أقول: أنا لا أستطيع فعل أي شيء مفيد.',
+                explanation: 'أنت قادر ومميز، وكل محاولة تزيدك ذكاءً وخبرة.',
+              ),
+              QuizOptionModel(
+                keyId: 'D',
+                text: 'أطلب من شخص آخر حلها لي بالكامل دون أن أحاول.',
+                explanation: 'الاعتماد الكلي على الآخرين يمنعك من تطوير مهاراتك الذاتية.',
+              ),
+            ],
+            correctKeyId: 'A',
+            encouragementCorrect: 'يا لك من قائد عبقري ومثابر! قمة المجد تليق بك دائماً يا بطل.',
+            gentleFeedbackWrong: 'محاولة رائعة! تذكر أن كل فشل هو خطوة نحو النجاح إذا واصلت المحاولة بإصرار.',
           ),
         ),
       ],
@@ -1526,18 +1888,37 @@ class ChildRepository {
     ),
   ];
 
-  static List<WorldModel> get defaultWorlds => _defaultWorlds;
+  static List<WorldModel> _enrichWorlds(List<WorldModel> list) {
+    return list.map((w) {
+      final enrichedMissions = w.missions.map((m) {
+        if (m.quizzes.length >= 10) return m;
+        final expanded = World1QuizzesData.getExpanded10Quizzes(m.id, m.habitName, m.quiz);
+        return m.copyWith(quizzes: expanded);
+      }).toList();
+      return WorldModel(
+        worldNumber: w.worldNumber,
+        name: w.name,
+        description: w.description,
+        worldColor: w.worldColor,
+        isPremium: w.isPremium,
+        missions: enrichedMissions,
+      );
+    }).toList();
+  }
+
+  static List<WorldModel> get defaultWorlds => _enrichWorlds(_defaultWorlds);
 
   static List<WorldModel> getWorlds() {
     final cached = HiveService.getCachedWorlds();
     if (cached != null && cached.isNotEmpty) {
       try {
-        return cached.map((map) => WorldModel.fromMap(map)).toList();
+        final parsed = cached.map((map) => WorldModel.fromMap(map)).toList();
+        return _enrichWorlds(parsed);
       } catch (_) {
-        return _defaultWorlds;
+        return defaultWorlds;
       }
     }
-    return _defaultWorlds;
+    return defaultWorlds;
   }
 
   static List<WorldModel> get worlds => getWorlds();

@@ -193,9 +193,10 @@ class MissionModel {
   final int rewardStars;
   final int rewardPoints;
   final List<StorySceneModel> storyScenes;
+  final List<QuizModel> quizzes;
   final QuizModel quiz;
 
-  const MissionModel({
+  MissionModel({
     required this.id,
     required this.number,
     required this.title,
@@ -204,8 +205,22 @@ class MissionModel {
     this.rewardStars = 3,
     this.rewardPoints = 150,
     required this.storyScenes,
-    required this.quiz,
-  });
+    List<QuizModel>? quizzes,
+    QuizModel? quiz,
+  })  : quizzes = (quizzes != null && quizzes.isNotEmpty)
+            ? quizzes
+            : (quiz != null ? [quiz] : const []),
+        quiz = quiz ??
+            ((quizzes != null && quizzes.isNotEmpty)
+                ? quizzes.first
+                : const QuizModel(
+                    situation: '',
+                    question: '',
+                    options: [],
+                    correctKeyId: 'A',
+                    encouragementCorrect: '',
+                    gentleFeedbackWrong: '',
+                  ));
 
   Map<String, dynamic> toMap() {
     return {
@@ -218,11 +233,23 @@ class MissionModel {
       'rewardPoints': rewardPoints,
       'storyScenes': storyScenes.map((s) => s.toMap()).toList(),
       'quiz': quiz.toMap(),
+      'quizzes': quizzes.map((q) => q.toMap()).toList(),
     };
   }
 
   factory MissionModel.fromMap(Map<dynamic, dynamic> map) {
     final rawScenes = (map['storyScenes'] ?? map['story_scenes']) as List<dynamic>? ?? [];
+    final rawQuizzes = (map['quizzes'] ?? map['quiz_list']) as List<dynamic>? ?? [];
+
+    final parsedQuizzes = rawQuizzes
+        .map((item) => QuizModel.fromMap(Map<dynamic, dynamic>.from(item as Map)))
+        .toList();
+
+    QuizModel? singleQuiz;
+    if (map['quiz'] != null) {
+      singleQuiz = QuizModel.fromMap(Map<dynamic, dynamic>.from(map['quiz'] as Map));
+    }
+
     return MissionModel(
       id: map['id']?.toString() ?? 'm_${DateTime.now().millisecondsSinceEpoch}',
       number: (map['number'] as num?)?.toInt() ?? 1,
@@ -234,16 +261,8 @@ class MissionModel {
       storyScenes: rawScenes
           .map((item) => StorySceneModel.fromMap(Map<dynamic, dynamic>.from(item as Map)))
           .toList(),
-      quiz: map['quiz'] != null
-          ? QuizModel.fromMap(Map<dynamic, dynamic>.from(map['quiz'] as Map))
-          : const QuizModel(
-              situation: '',
-              question: '',
-              options: [],
-              correctKeyId: 'A',
-              encouragementCorrect: '',
-              gentleFeedbackWrong: '',
-            ),
+      quizzes: parsedQuizzes.isNotEmpty ? parsedQuizzes : (singleQuiz != null ? [singleQuiz] : null),
+      quiz: singleQuiz ?? (parsedQuizzes.isNotEmpty ? parsedQuizzes.first : null),
     );
   }
 
@@ -256,6 +275,7 @@ class MissionModel {
     int? rewardStars,
     int? rewardPoints,
     List<StorySceneModel>? storyScenes,
+    List<QuizModel>? quizzes,
     QuizModel? quiz,
   }) {
     return MissionModel(
@@ -267,6 +287,7 @@ class MissionModel {
       rewardStars: rewardStars ?? this.rewardStars,
       rewardPoints: rewardPoints ?? this.rewardPoints,
       storyScenes: storyScenes ?? this.storyScenes,
+      quizzes: quizzes ?? this.quizzes,
       quiz: quiz ?? this.quiz,
     );
   }
