@@ -6,7 +6,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
-import '../../../../core/widgets/shapes/port_shape_avatar.dart';
+import '../../../../core/widgets/shapes/port_3d_model_viewer.dart';
 import '../../data/models/child_models.dart';
 import '../bloc/child_bloc.dart';
 import 'reward_progress_screen.dart';
@@ -38,6 +38,10 @@ class _MissionResultScreenState extends State<MissionResultScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    String selectedChar = 'PORT';
+    try {
+      selectedChar = context.watch<ChildBloc>().state.profile.selectedCharacter;
+    } catch (_) {}
 
     return AppScaffold(
       title: 'نتيجة الإنجاز',
@@ -49,14 +53,17 @@ class _MissionResultScreenState extends State<MissionResultScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Center(
-                child: PortShapeAvatar(
-                  characterName: 'PORT',
-                  size: 96,
-                  showBadge: true,
+              // Interactive 3D Trophy Victory Character
+              Center(
+                child: Port3DModelViewer(
+                  characterName: selectedChar,
+                  pose: CharacterPose.victory,
+                  height: 280,
+                  autoRotate: true,
+                  cameraControls: true,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // Information card.
               AppCard(

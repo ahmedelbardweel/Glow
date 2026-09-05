@@ -102,6 +102,7 @@ class ChildBloc extends Bloc<ChildEvent, ChildState> {
         selectedCharacter: event.characterName,
       );
       await ChildRepository.saveChildProfile(updated);
+      await ChildRepository.markProfileSetupComplete();
       await SupabaseService.upsertRemoteChildProfile(updated);
       emit(state.copyWith(profile: updated));
     });

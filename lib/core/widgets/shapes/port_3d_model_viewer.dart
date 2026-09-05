@@ -2,10 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import '../../theme/app_colors.dart';
 
-/// Domain data model.
-/// Interactive 3D character component.
+/// Character 3D Pose / Emotion
+enum CharacterPose {
+  neutral,   // Idle / Normal standing pose
+  frontal,   // Talking / Narration / Dialogue / Thoughtful
+  laughing,  // Laughing / Happy / Cheerful / Correct answer
+  victory,   // Trophy celebration / Mission complete / Badge won
+}
+
+/// Interactive 3D character component with multi-pose support.
 class Port3DModelViewer extends StatelessWidget {
   final String characterName; // PORT, MORT, FORT, QORT, LORT
+  final CharacterPose pose;
   final double height;
   final double width;
   final bool autoRotate;
@@ -15,6 +23,7 @@ class Port3DModelViewer extends StatelessWidget {
   const Port3DModelViewer({
     super.key,
     required this.characterName,
+    this.pose = CharacterPose.neutral,
     this.height = 280,
     this.width = double.infinity,
     this.autoRotate = true,
@@ -22,26 +31,28 @@ class Port3DModelViewer extends StatelessWidget {
     this.customModelUrl,
   });
 
-  /// Interactive 3D character component.
+  /// Dynamic 3D model resolver based on Character and Pose
   String _getModelSource() {
     if (customModelUrl != null && customModelUrl!.isNotEmpty) {
       return customModelUrl!;
     }
 
-    // Domain data model.
-    switch (characterName.toUpperCase()) {
-      case 'MORT':
-        return 'assets/models/copilot_3d.glb';
-      case 'FORT':
-        return 'assets/models/copilot_3d.glb';
-      case 'QORT':
-        return 'assets/models/copilot_3d.glb';
-      case 'LORT':
-      case 'SORT':
-        return 'assets/models/copilot_3d.glb';
-      case 'PORT':
+    final charKey = characterName.trim().toLowerCase();
+    final normalizedChar = (charKey == 'sort') ? 'lort' : charKey;
+    final validChar = ['port', 'mort', 'fort', 'lort', 'qort'].contains(normalizedChar)
+        ? normalizedChar
+        : 'port';
+
+    switch (pose) {
+      case CharacterPose.frontal:
+        return 'assets/models/${validChar}_frontal.glb';
+      case CharacterPose.laughing:
+        return 'assets/models/${validChar}_laughing.glb';
+      case CharacterPose.victory:
+        return 'assets/models/${validChar}_victory.glb';
+      case CharacterPose.neutral:
       default:
-        return 'assets/models/copilot_3d.glb';
+        return 'assets/models/${validChar}_neutral.glb';
     }
   }
 
@@ -81,6 +92,7 @@ class Port3DModelViewer extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
+              // 1. Ambient theme glow
               Container(
                 height: glowSize,
                 width: glowSize,
@@ -96,7 +108,7 @@ class Port3DModelViewer extends StatelessWidget {
                 ),
               ),
 
-              // Interactive 3D character component.
+              // 2. Interactive 3D character component (Pure 3D GLB).
               ModelViewer(
                 src: modelSrc,
                 alt: 'مجسم 3D لشخصية $characterName',
@@ -109,6 +121,20 @@ class Port3DModelViewer extends StatelessWidget {
                 backgroundColor: Colors.transparent,
                 interactionPrompt: InteractionPrompt.none,
                 loading: Loading.eager,
+                relatedCss: '''
+                  #default-progress-bar,
+                  .progress-bar,
+                  .progress-mask,
+                  .default-progress-bar,
+                  div[slot="progress-bar"] {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    height: 0 !important;
+                    width: 0 !important;
+                  }
+                ''',
+                innerModelViewerHtml: '<div slot="progress-bar" style="display:none !important;"></div>',
               ),
 
               if (cameraControls)

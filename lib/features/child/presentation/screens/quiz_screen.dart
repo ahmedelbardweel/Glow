@@ -5,7 +5,9 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/services/asset_preload_service.dart';
 import '../../data/models/child_models.dart';
+import '../bloc/child_bloc.dart';
 import '../bloc/quiz_bloc.dart';
 import 'correct_answer_screen.dart';
 import 'wrong_answer_screen.dart';
@@ -25,6 +27,14 @@ class _QuizScreenState extends State<QuizScreen> {
   void initState() {
     super.initState();
     context.read<QuizBloc>().add(InitQuizEvent(widget.mission));
+
+    // Preload both victory (for correct answer) and frontal (for wrong answer) ahead of submission
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final charName = context.read<ChildBloc>().state.profile.selectedCharacter;
+      // ignore: unawaited_futures
+      AssetPreloadService().preloadQuizCompletionAssets(activeCharacter: charName);
+    });
   }
 
   void _onSelectOption(String keyId) {

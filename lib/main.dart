@@ -12,12 +12,24 @@ import 'features/parent/presentation/bloc/parent_bloc.dart';
 import 'features/admin/presentation/bloc/admin_bloc.dart';
 import 'features/splash_and_auth/presentation/screens/splash_screen.dart';
 
+import 'core/services/asset_preload_service.dart';
+import 'core/database/hive_keys.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize local persistence and trigger background synchronization
   await HiveService.init();
   await OfflineFirstSyncManager.initializeAndSync();
+
+  // High-performance warm-up of TTS and 3D assets in background
+  final activeChar = HiveService.getChildData<String>(
+        HiveKeys.selectedCharacterKey,
+        defaultValue: 'PORT',
+      ) ??
+      'PORT';
+  // ignore: unawaited_futures
+  AssetPreloadService().warmupApp(defaultCharacter: activeChar);
 
   runApp(const PortApp());
 }

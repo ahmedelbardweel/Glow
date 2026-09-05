@@ -22,23 +22,6 @@ class PortShapeAvatar extends StatelessWidget {
     this.use3D = true,
   });
 
-  String _getCharacterAssetPath() {
-    switch (characterName.toUpperCase()) {
-      case 'MORT':
-        return 'assets/images/characters/mort_3d.jpg';
-      case 'FORT':
-        return 'assets/images/characters/fort_3d.jpg';
-      case 'QORT':
-        return 'assets/images/characters/qort_3d.jpg';
-      case 'LORT':
-      case 'SORT':
-        return 'assets/images/characters/lort_3d.jpg';
-      case 'PORT':
-      default:
-        return 'assets/images/characters/port_3d.jpg';
-    }
-  }
-
   Color _getCharacterColor() {
     switch (characterName.toUpperCase()) {
       case 'MORT':
@@ -60,7 +43,6 @@ class PortShapeAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _getCharacterColor();
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final assetPath = _getCharacterAssetPath();
 
     Widget avatarWidget = AnimatedContainer(
       duration: const Duration(milliseconds: 200),
@@ -86,43 +68,13 @@ class PortShapeAvatar extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Interactive 3D character component.
-          if (use3D)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(size * 0.22),
-              child: SizedBox(
-                width: size,
-                height: size,
-                child: FittedBox(
-                  fit: BoxFit.cover,
-                  alignment: const Alignment(-0.68, -0.65),
-                  child: SizedBox(
-                    width: size * 2.5,
-                    height: size * 2.5,
-                    child: Image.asset(
-                      assetPath,
-                      fit: BoxFit.cover,
-                      alignment: const Alignment(-0.68, -0.65),
-                      errorBuilder: (_, __, ___) => CustomPaint(
-                        size: Size(size * 0.72, size * 0.72),
-                        painter: _CharacterFacePainter(
-                          color: color,
-                          character: characterName.toUpperCase(),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            )
-          else
-            CustomPaint(
-              size: Size(size * 0.72, size * 0.72),
-              painter: _CharacterFacePainter(
-                color: color,
-                character: characterName.toUpperCase(),
-              ),
+          CustomPaint(
+            size: Size(size * 0.72, size * 0.72),
+            painter: _CharacterFacePainter(
+              color: color,
+              character: characterName.toUpperCase(),
             ),
+          ),
 
           // Interactive 3D character component.
           if (showBadge)

@@ -4,7 +4,9 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../child/data/repositories/child_repository.dart';
 import '../../../child/presentation/screens/child_profile_setup_screen.dart';
+import '../../../child/presentation/screens/world_map_screen.dart';
 import '../../../parent/presentation/screens/parent_auth_screen.dart';
 import '../../../organization/presentation/screens/org_setup_screen.dart';
 import '../../../admin/presentation/screens/admin_auth_screen.dart';
@@ -15,6 +17,7 @@ class UserSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isChildSetupComplete = ChildRepository.isProfileSetupComplete();
 
     return AppScaffold(
       body: SingleChildScrollView(
@@ -53,13 +56,21 @@ class UserSelectionScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         AppButton(
-                          text: 'دخول رحلة الطفل والمغامرة',
+                          text: isChildSetupComplete
+                              ? 'متابعة رحلة البطل والمغامرة'
+                              : 'دخول رحلة الطفل والمغامرة',
                           variant: AppButtonVariant.primary,
                           height: 52,
                           onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => const ChildProfileSetupScreen()),
-                            );
+                            if (isChildSetupComplete) {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const WorldMapScreen()),
+                              );
+                            } else {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const ChildProfileSetupScreen()),
+                              );
+                            }
                           },
                         ),
                       ],

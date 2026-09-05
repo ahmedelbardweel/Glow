@@ -8,8 +8,10 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_dialog.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/shapes/port_3d_model_viewer.dart';
+import '../../../../core/services/asset_preload_service.dart';
 import '../../../../core/services/tts_service.dart';
 import '../../data/models/child_models.dart';
+import '../bloc/child_bloc.dart';
 import '../bloc/story_bloc.dart';
 import 'story_complete_screen.dart';
 
@@ -40,6 +42,14 @@ class _StoryScreenState extends State<StoryScreen>
       duration: const Duration(seconds: 10),
     );
     context.read<StoryBloc>().add(InitStoryEvent(widget.mission));
+
+    // Warm up victory/celebration assets ahead of completing the story
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final charName = context.read<ChildBloc>().state.profile.selectedCharacter;
+      // ignore: unawaited_futures
+      AssetPreloadService().preloadQuizCompletionAssets(activeCharacter: charName);
+    });
   }
 
   void _playCurrentSceneAudio(StoryState state) {
@@ -57,6 +67,16 @@ class _StoryScreenState extends State<StoryScreen>
     _progressController.reset();
     if (state.isPlaying) {
       _progressController.forward(from: 0.0);
+    }
+
+    // Preload the next scene audio in the background so transitions are instant
+    final nextIndex = state.currentSceneIndex + 1;
+    if (nextIndex < widget.mission.storyScenes.length) {
+      final nextScene = widget.mission.storyScenes[nextIndex];
+      TtsService().preloadScene(
+        text: nextScene.dialogue,
+        speakerName: nextScene.speakerName,
+      );
     }
 
     TtsService().speakScene(
@@ -110,6 +130,42 @@ class _StoryScreenState extends State<StoryScreen>
     } else if (mounted && context.read<StoryBloc>().state.isPlaying) {
       _progressController.forward();
     }
+  }
+
+  CharacterPose _detectScenePose(StorySceneModel? scene) {
+    if (scene == null) return CharacterPose.frontal;
+    final text = '${scene.dialogue} ${scene.sceneDescription}'.toLowerCase();
+
+    // 1. Explicit victory with trophy / championship
+    if (text.contains('كأس البطولة') ||
+        text.contains('رفع الكأس') ||
+        text.contains('انتصار عظيم') ||
+        text.contains('فزنا بالبطولة') ||
+        text.contains('تتويج')) {
+      return CharacterPose.victory;
+    }
+
+    // 2. Laughing / Cheerful / Happy scenes
+    if (text.contains('ضحك') ||
+        text.contains('يضحك') ||
+        text.contains('ابتسم') ||
+        text.contains('يبتسم') ||
+        text.contains('ابتسامة') ||
+        text.contains('فرح') ||
+        text.contains('سعيد') ||
+        text.contains('مرح') ||
+        text.contains('يقفز') ||
+        text.contains('ملوحاً') ||
+        text.contains('بحماس') ||
+        text.contains('متحمس') ||
+        text.contains('رائع') ||
+        text.contains('مرحى') ||
+        text.contains('جميل')) {
+      return CharacterPose.laughing;
+    }
+
+    // 3. Talking / Explaining / Thoughtful / Sad / Serious scenes
+    return CharacterPose.frontal;
   }
 
   @override
@@ -234,8 +290,9 @@ class _StoryScreenState extends State<StoryScreen>
                       // Interactive 3D character component.
                       Expanded(
                         child: Port3DModelViewer(
-                          key: ValueKey('story_glb_${scene?.speakerName ?? 'PORT'}'),
+                          key: ValueKey('story_glb_${scene?.speakerName ?? 'PORT'}_${_detectScenePose(scene).name}'),
                           characterName: scene?.speakerName ?? 'PORT',
+                          pose: _detectScenePose(scene),
                           height: double.infinity,
                           autoRotate: true,
                           cameraControls: true,

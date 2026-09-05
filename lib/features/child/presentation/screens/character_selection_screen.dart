@@ -9,6 +9,7 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/shapes/port_3d_character.dart';
 import '../../../../core/widgets/shapes/port_3d_model_viewer.dart';
 import '../../data/models/child_models.dart';
+import '../../data/repositories/child_repository.dart';
 import '../bloc/child_bloc.dart';
 import 'world_map_screen.dart';
 
@@ -27,6 +28,7 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
   final bool _useReal3DMesh = true;
 
   void _onConfirm() {
+    ChildRepository.markProfileSetupComplete();
     context.read<ChildBloc>().add(SelectCharacterEvent(_selectedCharacter));
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const WorldMapScreen()),

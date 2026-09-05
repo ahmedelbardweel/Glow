@@ -17,10 +17,25 @@ class ChildProfileSetupScreen extends StatefulWidget {
 }
 
 class _ChildProfileSetupScreenState extends State<ChildProfileSetupScreen> {
-  final _nameController = TextEditingController(text: 'بطل المستقبل');
+  late final TextEditingController _nameController;
   int _selectedAge = 7;
 
   final List<int> _ages = [5, 6, 7, 8, 9, 10, 11, 12];
+
+  @override
+  void initState() {
+    super.initState();
+    final profile = context.read<ChildBloc>().state.profile;
+    final initialName = (profile.name.isNotEmpty &&
+            profile.name != 'بطل GLOW' &&
+            profile.name != 'بطل المستقبل')
+        ? profile.name
+        : '';
+    _nameController = TextEditingController(text: initialName);
+    if (_ages.contains(profile.age)) {
+      _selectedAge = profile.age;
+    }
+  }
 
   @override
   void dispose() {

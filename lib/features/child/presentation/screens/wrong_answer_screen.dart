@@ -6,8 +6,9 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
-import '../../../../core/widgets/shapes/port_shape_avatar.dart';
+import '../../../../core/widgets/shapes/port_3d_model_viewer.dart';
 import '../../data/models/child_models.dart';
+import '../bloc/child_bloc.dart';
 import '../bloc/quiz_bloc.dart';
 
 /// Application feature screen.
@@ -25,6 +26,10 @@ class WrongAnswerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final quiz = mission.quiz;
+    String selectedChar = 'PORT';
+    try {
+      selectedChar = context.watch<ChildBloc>().state.profile.selectedCharacter;
+    } catch (_) {}
 
     return AppScaffold(
       title: 'فرصة رائعة للتعلم!',
@@ -36,15 +41,17 @@ class WrongAnswerScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Interactive 3D character component.
-              const Center(
-                child: PortShapeAvatar(
-                  characterName: 'FORT',
-                  size: 100,
-                  showBadge: true,
+              // Interactive 3D Encouraging / Thoughtful Character
+              Center(
+                child: Port3DModelViewer(
+                  characterName: selectedChar,
+                  pose: CharacterPose.frontal,
+                  height: 250,
+                  autoRotate: true,
+                  cameraControls: true,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // Information card.
               AppCard(

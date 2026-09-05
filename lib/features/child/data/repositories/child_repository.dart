@@ -1957,6 +1957,35 @@ class ChildRepository {
     await HiveService.saveChildData(HiveKeys.childProfileKey, profile.toMap());
   }
 
+  static bool isProfileSetupComplete() {
+    final isComplete = HiveService.getSetting<bool>(
+      HiveKeys.isProfileCompleteKey,
+      defaultValue: false,
+    );
+    if (isComplete) return true;
+
+    final data = HiveService.getChildData<Map>(HiveKeys.childProfileKey);
+    if (data != null) {
+      final name = data['name']?.toString() ?? '';
+      final missions = (data['completedMissions'] as List?) ?? [];
+      final points = (data['points'] as num?)?.toInt() ?? 0;
+      final stars = (data['stars'] as num?)?.toInt() ?? 0;
+
+      if (missions.isNotEmpty ||
+          points > 0 ||
+          stars > 0 ||
+          (name.isNotEmpty && name != 'بطل GLOW' && name != 'بطل المستقبل')) {
+        HiveService.saveSetting(HiveKeys.isProfileCompleteKey, true);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static Future<void> markProfileSetupComplete() async {
+    await HiveService.saveSetting(HiveKeys.isProfileCompleteKey, true);
+  }
+
   static String calculateRankTitle(int points) {
     if (points >= 3000) return 'قائد أسطوري';
     if (points >= 2000) return 'حكيم القيم';

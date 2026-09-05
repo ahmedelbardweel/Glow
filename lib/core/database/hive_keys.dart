@@ -15,6 +15,7 @@ class HiveKeys {
   static const String lastCloudSyncKey = 'last_cloud_sync';
   static const String isOnlineModeKey = 'is_online_mode';
   static const String adminPasscodeKey = 'admin_passcode';
+  static const String hasLaunchedBeforeKey = 'has_launched_before';
 
   static const String childProfileKey = 'child_profile';
   static const String selectedCharacterKey = 'selected_character';
